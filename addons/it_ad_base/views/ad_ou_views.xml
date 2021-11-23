@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!-- Configuration/Lead & Opportunities/Lost Reasons Menu -->
+    <record id="ad_ou_action" model="ir.actions.act_window">
+        <field name="name">Организационное подразделение</field>
+        <field name="res_model">ad.ou</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+   
+</odoo>

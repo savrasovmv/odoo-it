@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<odoo>
+    
+    <record id="ad_set_group_form" model="ir.ui.view">
+      <field name="name">ad.set_group.form</field>
+      <field name="model">ad.set_group</field>
+      <field name="arch" type="xml">
+          <form string="Установка групп пользователям">
+            <sheet>
+              <group >
+
+                <field name="name"/>
+                <field name="active"/>
+              </group>
+
+              <group >
+
+                <field name="ou_id" colspan="4"/>
+                <field name="department_id" colspan="4"/>
+              </group>
+
+               <notebook>
+                  <page string="Назначить группы AD">
+                      <field name="set_group_line">
+                          <tree editable="botton">
+                              <field name="group_id"/>
+
+                          </tree>
+                      </field> 
+                  </page>
+                </notebook>                
+
+              
+            </sheet>
+          </form>
+      </field>
+  </record>
+
+  <record id="ad_set_group_view_tree" model="ir.ui.view">
+        <field name="name">ad.set_group.tree</field>
+        <field name="model">ad.set_group</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="ou_id"/>
+                <field name="department_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Configuration/Lead & Opportunities/Lost Reasons Menu -->
+    <record id="ad_set_group_action" model="ir.actions.act_window">
+        <field name="name">Установка групп пользователям</field>
+        <field name="res_model">ad.set_group</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+   
+</odoo>

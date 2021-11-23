@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_recruitment_doc_manager,hr.recruitment_doc,model_hr_recruitment_doc,hr.group_hr_manager,1,1,1,1
+access_hr_recruitment_doc_users,hr.recruitment_doc,model_hr_recruitment_doc,hr.group_hr_user,1,0,0,0
+access_hr_termination_doc_manager,hr.termination_doc,model_hr_termination_doc,hr.group_hr_manager,1,1,1,1
+access_hr_termination_doc_users,hr.termination_doc,model_hr_termination_doc,hr.group_hr_user,1,0,0,0
+access_hr_vacation_doc_manager,hr.vacation_doc,model_hr_vacation_doc,hr.group_hr_manager,1,1,1,1
+access_hr_vacation_doc_users,hr.vacation_doc,model_hr_vacation_doc,hr.group_hr_user,1,0,0,0
+access_hr_trip_doc_manager,hr.trip_doc,model_hr_trip_doc,hr.group_hr_manager,1,1,1,1
+access_hr_trip_doc_users,hr.trip_doc,model_hr_trip_doc,hr.group_hr_user,1,0,0,0
+access_hr_sick_leave_doc_manager,hr.sick_leave_doc,model_hr_sick_leave_doc,hr.group_hr_manager,1,1,1,1
+access_hr_sick_leave_doc_users,hr.sick_leave_doc,model_hr_sick_leave_doc,hr.group_hr_user,1,0,0,0
+access_hr_transfer_doc_manager,hr.transfer_doc,model_hr_transfer_doc,hr.group_hr_manager,1,1,1,1
+access_hr_transfer_doc_users,hr.transfer_doc,model_hr_transfer_doc,hr.group_hr_user,1,0,0,0

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="adbook_sync_ad_group_sync_ir_cron" model="ir.cron">
+            <field name="name">Группы AD: авто синхронизация</field>
+            <field name="model_id" ref="model_sync_wizard"/>
+            <field name="state">code</field>
+            <field name="code">model.ad_sync_group_action()</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+        </record>
+        
+    </data>
+</odoo>

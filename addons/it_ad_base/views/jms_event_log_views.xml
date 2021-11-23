@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<odoo>
+
+
+    <record id="jms_event_log_view_tree" model="ir.ui.view">
+        <field name="name">jms.event_log.tree</field>
+        <field name="model">jms.event_log</field>
+        <field name="arch" type="xml">
+            <tree edit="false" create="false">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="pc_name"/>
+                <field name="event_name"/>
+                <field name="users_id"/>
+                <field name="jms_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Configuration/Lead & Opportunities/Lost Reasons Menu -->
+    <record id="jms_event_log_action" model="ir.actions.act_window">
+        <field name="name">JMS события</field>
+        <field name="res_model">jms.event_log</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+   
+</odoo>

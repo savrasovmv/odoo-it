@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<odoo>
+
+     <menuitem id="menu_ad_root" name="ActiveDirectory" action="ad_users_action">
+
+        <menuitem id="ad_users_first_level_menu" name="Пользователи" sequence="10">
+            <menuitem id="ad_users_menu_action" action="ad_users_action"/>
+            <!-- <menuitem id="ad_organizacion_menu_action" action="ad_organizacion_action"/> -->
+            <menuitem id="ad_ou_menu_action" action="ad_ou_action"/>
+            <menuitem id="ad_department_menu_action" action="ad_department_action"/>
+            <!-- <menuitem id="ad_sync_users_wizard_menu_action" action="ad_sync_users_wizard_action"/> -->
+            <menuitem id="ad_mailbox_menu_action" action="ad_mailbox_action"/>
+            <menuitem id="jms_event_log_menu_action" action="jms_event_log_action"/>
+        </menuitem>
+
+         <menuitem id="ad_group_first_level_menu" name="Группы" sequence="20">
+            <menuitem id="ad_group_menu_action" action="ad_group_action"/>
+            <menuitem id="ad_set_group_menu_action" action="ad_set_group_action"/>
+        </menuitem>
+
+        <menuitem id="ad_wizard_first_level_menu" name="Действия" sequence="30">
+            <menuitem id="jms_wizard_menu_action" action="ad_base_jms_wizard_action"/>
+        </menuitem>
+
+        <menuitem id="ad_reports_first_level_menu" name="Отчеты" sequence="30">
+            <menuitem id="jms_report_menu_action" action="ad_base_jms_report_action"/>
+        </menuitem>
+
+        
+
+    </menuitem>
+
+</odoo>

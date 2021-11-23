@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <menuitem
+            id="hr_menu_personal_doc"
+            name="Документы"
+            sequence="11"
+            parent="hr.menu_hr_root"
+            groups="hr.group_hr_manager"
+            />
+
+
+        <menuitem
+            id="hr_menu_recruitment_doc"
+            name="Прием на работу"
+            parent="hr_menu_personal_doc"
+            action="hr_recruitment_doc_action"
+            sequence="1"
+            groups="hr.group_hr_manager"
+            />
+        
+        <menuitem
+            id="hr_menu_termination_doc"
+            name="Увольнения"
+            parent="hr_menu_personal_doc"
+            action="hr_termination_doc_action"
+            sequence="1"
+            groups="hr.group_hr_manager"
+            />
+        
+        <menuitem
+            id="hr_menu_vacation_doc"
+            name="Отпуска"
+            parent="hr_menu_personal_doc"
+            action="hr_vacation_doc_action"
+            sequence="1"
+            groups="hr.group_hr_manager"
+            />
+
+        <menuitem
+            id="hr_menu_trip_doc"
+            name="Командировки"
+            parent="hr_menu_personal_doc"
+            action="hr_trip_doc_action"
+            sequence="1"
+            groups="hr.group_hr_manager"
+            />
+
+        <menuitem
+            id="hr_menu_sick_leave_doc"
+            name="Больничные"
+            parent="hr_menu_personal_doc"
+            action="hr_sick_leave_doc_action"
+            sequence="1"
+            groups="hr.group_hr_manager"
+            />
+        
+        <menuitem
+            id="hr_menu_transfer_doc"
+            name="Переводы сотрудника"
+            parent="hr_menu_personal_doc"
+            action="hr_transfer_doc_action"
+            sequence="1"
+            groups="hr.group_hr_manager"
+            />
+
+
+
+
+
+</odoo>

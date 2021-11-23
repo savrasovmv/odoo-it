@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <!-- Скрыть персональную информация в профиле пользователя -->
+    <record id="hr_res_users_view_form_profile_delete_info" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="hr.res_users_view_form_profile" />
+        <field name="arch" type="xml">
+
+            <xpath expr="//page[@name='personal_information']" position="replace">
+
+            </xpath>
+
+            <xpath expr="//page[@name='hr_settings']" position="replace">
+
+            </xpath>
+
+            
+        </field>
+    </record>
+
+
+
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.view.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form" />
+        <field name="arch" type="xml">
+
+            <field name="mobile_phone" position="after">
+                <field name="mobile_phone2" />
+            </field>
+
+            <field name="work_phone" position="after">
+                <field name="ip_phone" />
+            </field>
+
+            <field name="work_email" position="after">
+                <field name="is_collective_work_email" />
+            </field>
+
+            <field name="birthday" position="after">
+                <field name="age" />
+            </field>
+
+            
+            
+            
+            
+            <xpath expr="//page[@name='hr_settings']/group" position="inside">
+                <group
+                    name="service_information"
+                    groups="hr.group_hr_user"
+                    string="Стаж"
+                >
+                    <field name="service_start_date" />
+                    <field name="service_termination_date" />
+                    <field name="service_duration" invisible="1" />
+                    <label for="service_duration" string="Стаж работы" />
+                    <div>
+                        <field name="service_duration_years" nolabel="1" />
+                        <span class="ml8 mr8">г.</span>
+                        <field name="service_duration_months" nolabel="1" />
+                        <span class="ml8 mr8">м.</span>
+                        <field name="service_duration_days" nolabel="1" />
+                        <span class="ml8">д.</span>
+                    </div>
+                </group>
+
+                <group
+                    name="service_status"
+                    groups="hr.group_hr_user"
+                    string="Текущее состояние"
+                >
+                    <field name="is_fired" />
+                    <field name="service_status" />
+                    <div>
+                        <span class="ml8 mr8">с</span>
+                        <field name="service_status_start_date" nolabel="1" />
+                        <span class="ml8 mr8">по</span>
+                        <field name="service_status_end_date" nolabel="1" />
+                    </div>
+                </group>
+
+                <group
+                    name="1с_information"
+                    groups="hr.group_hr_user"
+                    string="1с"
+                >
+                    
+                    <field name="personal_email" />
+                    <field name="number_1c" />
+                    <field name="employment_type_1c" />
+                    <field name="guid_1c" />
+                    
+                </group>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page name="passport" string="Удостоверение личности" groups="base.group_erp_manager">
+                    <group string="Удостоверение личности" col="4">
+                        <field name="passport_type"/>
+                        <field name="passport_country" colspan='2'/>
+                        <field name="passport_series" colspan='2'/>
+                        <field name="passport_number" colspan='2'/>
+                        <field name="passport_issued_by" colspan='4'/>
+                        <field name="passport_department_code" colspan='2'/>
+                        <field name="passport_date_issue" colspan='2'/>
+                        <field name="passport_date_validity" colspan='2'/>
+                        <field name="passport_place_birth" colspan='4'/>
+
+                    </group>
+
+
+                </page>
+                <page name="addres" string="Адреса проживания" groups="base.group_erp_manager">
+                    <group>
+                        
+                        <group string="Адрес регистрации(постоянной/временной)">
+                            <field name="ra_full" string="Полный"/>
+                            <field name="ra_zipcode"/>
+                            <field name="ra_area_type"/>
+                            <field name="ra_area"/>
+                            <field name="ra_district_type"/>
+                            <field name="ra_district"/>
+                            <field name="ra_city_type"/>
+                            <field name="ra_city"/>
+                            <field name="ra_locality_type"/>
+                            <field name="ra_locality"/>
+                            <field name="ra_mun_district_type"/>
+                            <field name="ra_mun_district"/>
+                            <field name="ra_settlement_type"/>
+                            <field name="ra_settlement"/>
+                            <field name="ra_city_district_type"/>
+                            <field name="ra_city_district"/>
+                            <field name="ra_territory_type"/>
+                            <field name="ra_territory"/>
+                            <field name="ra_street_type"/>
+                            <field name="ra_street"/>
+                            <field name="ra_house_type"/>
+                            <field name="ra_house"/>
+                            <field name="ra_buildings_type"/>
+                            <field name="ra_buildings"/>
+                            <field name="ra_apartments_type"/>
+                            <field name="ra_apartments"/>
+                            <field name="ra_stead"/>
+
+                            <field name="ra_end_date"/>
+                            
+
+                        </group>
+                        <group string="Адрес фактического проживания">
+                            <field name="fa_full" string="Полный"/>
+                            <field name="fa_zipcode"/>
+                            <field name="fa_area_type"/>
+                            <field name="fa_area"/>
+                            <field name="fa_district_type"/>
+                            <field name="fa_district"/>
+                            <field name="fa_city_type"/>
+                            <field name="fa_city"/>
+                            <field name="fa_locality_type"/>
+                            <field name="fa_locality"/>
+                            <field name="fa_mun_district_type"/>
+                            <field name="fa_mun_district"/>
+                            <field name="fa_settlement_type"/>
+                            <field name="fa_settlement"/>
+                            <field name="fa_city_district_type"/>
+                            <field name="fa_city_district"/>
+                            <field name="fa_territory_type"/>
+                            <field name="fa_territory"/>
+                            <field name="fa_street_type"/>
+                            <field name="fa_street"/>
+                            <field name="fa_house_type"/>
+                            <field name="fa_house"/>
+                            <field name="fa_buildings_type"/>
+                            <field name="fa_buildings"/>
+                            <field name="fa_apartments_type"/>
+                            <field name="fa_apartments"/>
+                            <field name="fa_stead"/>
+                            
+
+                        </group>
+                    </group>
+
+                </page>
+
+                <page name="ad" string="AD" groups="base.group_erp_manager">
+                    <group string="Системные параметры" >
+
+                        <field name="write_date"/>
+                        <field name="ad_users_id"/>
+                    </group>
+
+
+                </page>
+
+                <!-- <page name="adbook" string="Справочник" groups="base.group_erp_manager">
+                    <group  >
+                        <field name="is_view_adbook"/>
+                        <field name="sequence"/>
+                    </group>
+
+
+                </page> -->
+                
+            </xpath>
+        </field>
+    </record>
+
+
+
+    <record id="hr_employee_view_kanban" model="ir.ui.view">
+        <field name="name">hr.employee.view.kanban</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.hr_kanban_view_employees" />
+        <field name="arch" type="xml">
+
+            
+            <xpath expr="//ul" position="inside">
+                <li t-if="record.ip_phone.raw_value" class="o_force_ltr">Вн.номер: <field name="ip_phone"/></li>
+                <li t-if="record.mobile_phone.raw_value" class="o_force_ltr">Моб1: <field name="mobile_phone"/></li>
+                <li t-if="record.mobile_phone2.raw_value" class="o_force_ltr">Моб2: <field name="mobile_phone2"/></li>
+                
+            </xpath>
+
+        </field>
+    </record>
+
+    
+
+    <!-- Добавить пунк в действия -->
+    <!-- <record id="action_update_user_and_partner_by_employee" model="ir.actions.server">
+        <field name="name">Обновить пользователя и партнера</field>
+        <field name="model_id" ref="model_hr_employee" />
+        <field name="binding_model_id" ref="hr.model_hr_employee" />
+        <field name="state">code</field>
+        <field name="code">records.action_update_user_and_partner_by_employee()</field>
+    </record> -->
+</odoo>

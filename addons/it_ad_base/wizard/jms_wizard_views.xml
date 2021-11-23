@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Multi Sale Order Confirmation Wizard -->
+	<record id="ad_base_jms_wizard_view" model="ir.ui.view">
+        <field name="name">jms.wizard.view</field>
+        <field name="model">jms.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirm">
+                
+                <div>
+                    <p>Загрузить JMS события</p>
+                    <button name="jms_wizard_action" string="JMS события" type="object" class="oe_highlight"/>
+                    <p></p>
+                    
+                </div>
+                
+
+                <footer>
+                    
+
+                    
+                </footer>
+                <notebook colspan="4">
+                    <page string="Комментарии">
+                        <field name="result" nolabel="1"/>
+                    </page>
+                </notebook> 
+            </form>
+        </field>
+    </record>
+
+    <record id="ad_base_jms_wizard_action" model="ir.actions.act_window">
+        <field name="name">Загрузить JMS события</field>
+        <field name="res_model">jms.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <!-- <field name="binding_model_id" ref="model_ad_employer"/> -->
+    </record>
+
+    
+
+    
+
+</odoo>

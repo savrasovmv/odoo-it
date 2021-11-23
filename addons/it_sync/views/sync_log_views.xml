@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="it_sync_sync_log_view_form" model="ir.ui.view">
+        <field name="name">sync.log.form</field>
+        <field name="model">sync.log</field>
+        <field name="arch" type="xml">
+            <form string="Журна синхронизации" create="false" edit="false">
+                <sheet>
+                  <group>
+                    <field name="date" string="Дата"/>  
+                    <field name="name"/>  
+                    <field name="is_error"/>  
+                    <field name="result"/>
+                  </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="it_sync_sync_log_view_tree" model="ir.ui.view">
+        <field name="name">sync.log.tree</field>
+        <field name="model">sync.log</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false">
+                <field name="date" string="Дата"/>
+                <field name="name"/>
+                <field name="obj"/>
+                <field name="is_error"/>  
+
+            </tree>
+        </field>
+    </record>
+
+    <!-- Configuration/Lead & Opportunities/Lost Reasons Menu -->
+    <record id="it_sync_sync_log_action" model="ir.actions.act_window">
+        <field name="name">Журна синхронизации</field>
+        <field name="res_model">sync.log</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Нет записей
+          </p>
+        </field>
+    </record>
+
+   
+</odoo>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Multi Sale Order Confirmation Wizard -->
+	<!-- <record id="ad_base_jms_report_view" model="ir.ui.view">
+        <field name="name">jms.report.view</field>
+        <field name="model">jms.report</field>
+        <field name="arch" type="xml">
+            <form string="Отчетность по JMS" create="false" edit="false">
+                <sheet>
+                    <group>
+                        
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            
+                        </group>
+                       
+                        
+                    </group>
+                
+                <div>
+                    <p>Отчеты</p>
+                    <button name="jms_report_wizard_action" string="JMS Отчет" type="object" class="oe_highlight"/>
+                    <p></p>
+                    
+                </div>
+                </sheet>
+                
+
+               
+            </form>
+        </field>
+    </record>
+
+    <record id="ad_base_jms_report_action" model="ir.actions.act_window">
+        <field name="name">JMS отчеты</field>
+        <field name="res_model">jms.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record> -->
+
+
+  <record id="ad_base_jms_report_view" model="ir.ui.view">
+     <field name="name">jms.report.view</field>
+     <field name="model">jms.report</field>
+     <field name="arch" type="xml">
+        <form string="Excel Report">
+           <field name="state" invisible="1"/>
+           <div states="get">
+              <group>
+                 <field name="summary_data" colspan="4" invisible="1"/>
+                 <field name="file_name" filename="summary_data" colspan="4"/>
+              </group>
+           </div>
+           <div states="choose">
+              <group>
+                 <group>
+                    <field name="date_start" />
+                    <field name="date_end" />
+                 </group>
+              </group>
+           </div>
+           <footer states="choose">
+              <button string="Сформировать"
+                           class="btn-primary"
+                           name="jms_report_wizard_action"
+                           type="object"/>
+              <button string="Отмена"
+                           class="btn-default"
+                           special="cancel" />
+           </footer>
+           <footer states="get">
+              <button special="cancel" string="Закрыть" class="oe_highlight" />
+           </footer>
+        </form>
+     </field>
+  </record>
+  
+  <record id="ad_base_jms_report_action" model="ir.actions.act_window">
+     <field name="name">JMS отчеты</field>
+     <field name="type">ir.actions.act_window</field>
+     <field name="res_model">jms.report</field>
+     <field name="view_mode">form</field>
+     <field name="view_id" ref="ad_base_jms_report_view"/>
+     <field name="target">new</field>
+  </record>
+
+    
+
+    
+
+</odoo>

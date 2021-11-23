@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="hr_recruitment_doc_view_tree" model="ir.ui.view">
+        <field name="name">hr.recruitment_doc.tree</field>
+        <field name="model">hr.recruitment_doc</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="number_1c"/>
+                <field name="name"/>
+                <field name="job_title"/>
+                <field name="posted"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_recruitment_doc_action" model="ir.actions.act_window">
+        <field name="name">Прием на работу</field>
+        <field name="res_model">hr.recruitment_doc</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+
+
+    <record id="hr_termination_doc_view_tree" model="ir.ui.view">
+        <field name="name">hr.termination_doc.tree</field>
+        <field name="model">hr.termination_doc</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="number_1c"/>
+                <field name="name"/>
+                <field name="posted"/>
+            </tree>
+        </field>
+    </record>
+    <record id="hr_termination_doc_action" model="ir.actions.act_window">
+        <field name="name">Увольнения</field>
+        <field name="res_model">hr.termination_doc</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+
+    <record id="hr_vacation_doc_view_tree" model="ir.ui.view">
+        <field name="name">hr.vacation_doc.tree</field>
+        <field name="model">hr.vacation_doc</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="number_1c"/>
+                <field name="name"/>
+                <field name="posted"/>
+            </tree>
+        </field>
+    </record>
+    <record id="hr_vacation_doc_action" model="ir.actions.act_window">
+        <field name="name">Отпуска</field>
+        <field name="res_model">hr.vacation_doc</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+
+
+    <record id="hr_trip_doc_view_tree" model="ir.ui.view">
+        <field name="name">hr.trip_doc.tree</field>
+        <field name="model">hr.trip_doc</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="number_1c"/>
+                <field name="name"/>
+                <field name="posted"/>
+            </tree>
+        </field>
+    </record>
+    <record id="hr_trip_doc_action" model="ir.actions.act_window">
+        <field name="name">Командировки</field>
+        <field name="res_model">hr.trip_doc</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+
+
+
+    <record id="hr_sick_leave_doc_view_tree" model="ir.ui.view">
+        <field name="name">hr.sick_leave_doc.tree</field>
+        <field name="model">hr.sick_leave_doc</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="number_1c"/>
+                <field name="name"/>
+                <field name="posted"/>
+            </tree>
+        </field>
+    </record>
+    <record id="hr_sick_leave_doc_action" model="ir.actions.act_window">
+        <field name="name">Больничные</field>
+        <field name="res_model">hr.sick_leave_doc</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+   
+
+
+
+
+
+    <record id="hr_transfer_doc_view_tree" model="ir.ui.view">
+        <field name="name">hr.transfer_doc.tree</field>
+        <field name="model">hr.transfer_doc</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="number_1c"/>
+                <field name="name"/>
+                <field name="posted"/>
+            </tree>
+        </field>
+    </record>
+    <record id="hr_transfer_doc_action" model="ir.actions.act_window">
+        <field name="name">Переводы сотрудника</field>
+        <field name="res_model">hr.transfer_doc</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+   
+</odoo>

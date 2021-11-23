@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Multi Sale Order Confirmation Wizard -->
+	<record id="ad_sync_users_wizard_view" model="ir.ui.view">
+        <field name="name">ad.sync_users_wizard.view</field>
+        <field name="model">ad.sync_users_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirm">
+                <!-- <group>
+                        <group string="Период">
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                        <group>
+                             <button name="reconfirm_period_korm_korm" string="Перепровести за период" type="object" class="oe_highlight"/>
+                        </group>
+                </group> -->
+                <p>Нажмити Обновить для синхронизации справочников с AD.</p>
+
+                <footer>
+                    <button name="ad_sync_emloyer_action" string="Обновить Пользователей" type="object" class="oe_highlight"/>
+                    <button name="ad_sync_group_action" string="Обновить Группы" type="object" class="oe_highlight"/>
+                    
+                </footer>
+                <notebook colspan="4">
+                    <page string="Комментарии">
+                        <field name="result" nolabel="1"/>
+                    </page>
+                </notebook> 
+            </form>
+        </field>
+    </record>
+
+    <record id="ad_sync_users_wizard_action" model="ir.actions.act_window">
+        <field name="name">Синхронизовать с AD</field>
+        <field name="res_model">ad.sync_users_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <!-- <field name="binding_model_id" ref="model_ad_users"/> -->
+    </record>
+
+     <!-- <record id="ad_users_action_wizard" model="ir.actions.act_window">
+        <field name="name">Синхранизация с AD</field>
+        <field name="res_model">ad.sync_users_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="ad.users"/>
+    </record> -->
+
+    
+
+</odoo>

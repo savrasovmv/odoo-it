@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="it_sync_sync_tasks_view_form" model="ir.ui.view">
+        <field name="name">sync.tasks.form</field>
+        <field name="model">sync.tasks</field>
+        <field name="arch" type="xml">
+            <form string="Журнал задач" create="false" edit="true">
+                <header>
+                    <button name="do_tasks_action" type="object" string="Выполнить задачи"/>
+                    
+                </header>
+                <sheet>
+                  <group>
+                    <field name="date"/>  
+                    <field name="name"/>  
+                    <field name="obj_create"/>  
+                    <field name="obj_create_name"/>
+                    <field name="obj_create_id"/>
+                    <field name="is_completed"/>
+                    <field name="is_canceled"/>
+                    <field name="is_updated"/>
+                  </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="it_sync_sync_tasks_view_tree" model="ir.ui.view">
+        <field name="name">sync.tasks.tree</field>
+        <field name="model">sync.tasks</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>  
+                <field name="name"/>  
+                <field name="obj_create"/>  
+                <field name="obj_create_name"/>
+                <field name="obj_create_id"/>
+                <field name="is_completed"/>  
+                <field name="is_canceled"/>
+                <field name="is_updated"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <!-- Configuration/Lead & Opportunities/Lost Reasons Menu -->
+    <record id="it_sync_sync_tasks_action" model="ir.actions.act_window">
+        <field name="name">Журнал задач</field>
+        <field name="res_model">sync.tasks</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Нет записей
+          </p>
+        </field>
+    </record>
+
+   
+</odoo>

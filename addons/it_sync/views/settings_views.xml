@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>   
+    <record id="it_sync_res_config_settings_view_form_inherit" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.it_sync</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="25" />
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Синхронизация" string="Синхронизация" data-key="it_sync">
+
+                    <h2>LDAP синхронизация пользователей</h2>
+                    <div class="row mt16 o_settings_container">
+                        
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_host"/>
+                                <div class="text-muted">
+                                    Host
+                                </div>
+                                <field name="ldap_host"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_port"/>
+                                <div class="text-muted">
+                                    Port
+                                </div>
+                                <field name="ldap_port" class="col-lg-2"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_ssl"/>
+                                <div class="text-muted">
+                                    SSL?
+                                </div>
+                                <field name="ldap_ssl"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_connect_timeout"/>
+                                <div class="text-muted">
+                                    Timeout
+                                </div>
+                                <field name="ldap_connect_timeout" class="col-lg-2"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_search_base"/>
+                                <div class="text-muted">
+                                    search_base
+                                </div>
+                                <field name="ldap_search_base"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_search_filter"/>
+                                <div class="text-muted">
+                                    search_base
+                                </div>
+                                <field name="ldap_search_filter"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_search_group_filter"/>
+                                <div class="text-muted">
+                                    search_base
+                                </div>
+                                <field name="ldap_search_group_filter"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_home_dirertory"/>
+                                <div class="text-muted">
+                                    homeDirectory
+                                </div>
+                                <field name="ldap_home_dirertory"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_home_drive"/>
+                                <div class="text-muted">
+                                    homeDrive
+                                </div>
+                                <field name="ldap_home_drive"/>
+
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_user"/>
+                                <div class="text-muted">
+                                    Имя пользователя
+                                </div>
+                                <field name="ldap_user"/>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="ldap_password"/>
+                                <div class="text-muted">
+                                    Пароль
+                                </div>
+                                <field name="ldap_password" password="True"/>
+
+                            </div>
+                        </div>
+
+                        
+
+                    </div>
+
+                    <h2>JWS</h2>
+                    <div class="row mt16 o_settings_container">
+                        
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="jms_server"/>
+                                <div class="text-muted">
+                                    Сервер БД
+                                </div>
+                                <field name="jms_server"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="jms_driver"/>
+                                <div class="text-muted">
+                                    Драйвер MS SQL
+                                </div>
+                                <field name="jms_driver"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="jms_database"/>
+                                <div class="text-muted">
+                                    Имя БД
+                                </div>
+                                <field name="jms_database"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="jms_user"/>
+                                <div class="text-muted">
+                                    Пользователь БД
+                                </div>
+                                <field name="jms_user"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="ldap_settings">
+                                <label for="jms_password"/>
+                                <div class="text-muted">
+                                    Пароль БД
+                                </div>
+                                <field name="jms_password"/>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2>ЗУП API</h2>
+                    <div class="row mt16 o_settings_container">
+                        
+                        <div class="col-lg-6 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_user"/>
+                                <div class="text-muted">
+                                    Пользователь
+                                </div>
+                                <field name="zup_user"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_password"/>
+                                <div class="text-muted">
+                                    Пароль
+                                </div>
+                                <field name="zup_password" password="True"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_timeout"/>
+                                <div class="text-muted">
+                                    Timeout
+                                </div>
+                                <field name="zup_timeout" class="col-lg-2"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_empl_list"/>
+                                <div class="text-muted">
+                                    Список сотрудников URL API
+                                </div>
+                                <field name="zup_url_get_empl_list"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_empl"/>
+                                <div class="text-muted">
+                                    Сотрудник URL API
+                                </div>
+                                <field name="zup_url_get_empl"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_dep_list"/>
+                                <div class="text-muted">
+                                    Список подразделений URL API
+                                </div>
+                                <field name="zup_url_get_dep_list"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_passport_list"/>
+                                <div class="text-muted">
+                                    Список Документы УЛ и дреса сотрудников URL API
+                                </div>
+                                <field name="zup_url_get_passport_list"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_recruitment_doc_list"/>
+                                <div class="text-muted">
+                                    Список документов Прием на работу
+                                </div>
+                                <field name="zup_url_get_recruitment_doc_list"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_termination_doc_list"/>
+                                <div class="text-muted">
+                                    Список документов Увольнения
+                                </div>
+                                <field name="zup_url_get_termination_doc_list"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_vacation_doc_list"/>
+                                <div class="text-muted">
+                                    Список документов Отпуска
+                                </div>
+                                <field name="zup_url_get_vacation_doc_list"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_trip_doc_list"/>
+                                <div class="text-muted">
+                                    Список документов Командировки
+                                </div>
+                                <field name="zup_url_get_trip_doc_list"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_sick_leave_doc_list"/>
+                                <div class="text-muted">
+                                    Список документов Больничные
+                                </div>
+                                <field name="zup_url_get_sick_leave_doc_list"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_transfer_doc_list"/>
+                                <div class="text-muted">
+                                    Список документов Переводы сотрудников
+                                </div>
+                                <field name="zup_url_get_transfer_doc_list"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_multi_transfer_doc_list"/>
+                                <div class="text-muted">
+                                    Список документов Переводы сотрудников (группа)
+                                </div>
+                                <field name="zup_url_get_multi_transfer_doc_list"/>
+
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_get_multi_transfer_doc_list"/>
+                                <div class="text-muted">
+                                    Список измененных кадровых документов
+                                </div>
+                                <field name="zup_url_get_change_doc_list"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_url_remove_change_doc_list"/>
+                                <div class="text-muted">
+                                    Удаление из Списка измененных кадровых документов
+                                </div>
+                                <field name="zup_url_remove_change_doc_list"/>
+
+                            </div>
+                        </div>
+
+                                                
+
+                    </div>
+
+                    
+
+                </div>
+            </xpath>
+        </field>
+    </record>
+   
+    <record id="it_sync_settings_action" model="ir.actions.act_window">
+        <field name="name">Настройки</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_id" ref="it_sync_res_config_settings_view_form_inherit"/>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'it_sync'}</field>
+    </record>
+
+    <!-- <record id="fs_settings_menu" model="ir.ui.menu">
+        <field name="action" ref="it_sync.fs_settings_action"/>
+    </record> -->
+
+</odoo>

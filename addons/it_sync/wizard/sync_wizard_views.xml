@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Multi Sale Order Confirmation Wizard -->
+	<record id="it_sync_sync_wizard_view" model="ir.ui.view">
+        <field name="name">sync.wizard.view</field>
+        <field name="model">sync.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirm">
+                
+                
+                <group string="Синхронизации с AD">
+
+                    <field name="full_sync"/>
+                </group>
+                <div>
+                    <p>Загрузить информацию: телефоны, e-mail, CN, и т.п</p>
+                    <button name="ad_sync_users_wizard_action" string="Обновить Пользователей AD" type="object" class="oe_highlight"/>
+                    <p></p>
+                    <p>Загрузить группы из AD</p>
+                    <button name="ad_sync_group_wizard_action" string="Обновить Группы AD" type="object" class="oe_highlight"/>
+
+                    <p></p>
+                    <p>Связать пользователей AD со справочником Сотрудники</p>
+                    <button name="join_user_and_employee_wizard_action" string="Связать пользователей AD" type="object" class="oe_highlight"/>
+                </div>
+                <group string="Синхронизации с ЗУП">
+
+                    
+                    
+                </group>
+                <div>
+                    <p>Загружает Подразделения из ЗУП</p>
+                    <button name="zup_sync_dep_wizard_action" string="Обновить Подразделения из ЗУП" type="object" class="oe_highlight"/>
+                    <p></p>
+                    <p>Загружает Сотрудников из ЗУП</p>
+                    <button name="zup_sync_employer_wizard_action" string="Обновить Сотрудников из ЗУП" type="object" class="oe_highlight"/>
+                    <p></p>
+                    <p>Загружает Документы УЛ и Адреса сотрудников</p>
+                    <button name="zup_sync_passport_wizard_action" string="Обновить Документы УЛ и адреса из ЗУП" type="object" class="oe_highlight"/>
+
+                    <p></p>
+                    
+                </div>
+
+                <div>
+                    <group string="Период загрузки">
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                    </group>
+                    <p>Загружает Кадровые Документы</p>
+                    <button name="zup_sync_personal_doc_wizard_action" string="Обновить Кадровые Документы из ЗУП" type="object" class="oe_highlight"/>
+
+                </div>
+
+
+                <div>
+                    <p></p>
+                    <p>Загружает Измененные Кадровые документы</p>
+                    <button name="zup_sync_personal_doc_change_wizard_action" string="Измененные Кадровые документы" type="object" class="oe_highlight"/>
+                    <p></p>
+                    <group string="Статусы сотрудников">
+                        <button name="update_employer_status_wizard_action" string="Статусы сотрудников" type="object" class="oe_highlight"/>
+                    </group>
+
+                </div>
+
+                <footer>
+                    
+
+                    
+                </footer>
+                <notebook colspan="4">
+                    <page string="Комментарии">
+                        <field name="result" nolabel="1"/>
+                    </page>
+                </notebook> 
+            </form>
+        </field>
+    </record>
+
+    <record id="it_sync_wizard_action" model="ir.actions.act_window">
+        <field name="name">Синхронизация с AD и ЗУП</field>
+        <field name="res_model">sync.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <!-- <field name="binding_model_id" ref="model_ad_employer"/> -->
+    </record>
+
+    
+
+    
+
+</odoo>

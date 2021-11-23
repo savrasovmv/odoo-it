@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<odoo>
+
+     <menuitem id="menu_it_sync_root" name="Синхронизация" action="it_sync_sync_log_action">
+
+        <menuitem id="it_sync_first_level_menu" name="Синхронизация" groups="base.group_erp_manager" sequence="10">
+            <menuitem id="it_sync_wizard_menu_action" action="it_sync_wizard_action" groups="base.group_erp_manager"/>
+            <menuitem id="it_sync_sync_log_menu_action" action="it_sync_sync_log_action"/>
+            <menuitem id="it_sync_sync_tasks_menu_action" action="it_sync_sync_tasks_action"/>
+        </menuitem>
+        
+        <menuitem id="it_sync_zup_first_level_menu" name="1С:ЗУП" sequence="20">
+          
+        </menuitem>
+
+        <!-- <menuitem id="it_sync_ad_first_level_menu" name="Active Directory" groups="base.group_erp_manager" sequence="30">
+            <menuitem id="it_sync_ad_group_menu_action" action="it_sync_ad_group_action"/>
+        </menuitem> -->
+
+         
+        <menuitem id="it_sync_settings_first_level_menu" name="Настройки" sequence="40">
+            <menuitem id="it_sync_settings_menu_action" action="it_sync_settings_action"/>
+        </menuitem>
+
+    </menuitem>
+
+</odoo>

@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<odoo>
+    
+    <record id="ad_users_view_search" model="ir.ui.view">
+        <field name="name">ad.users.view.search</field>
+        <field name="model">ad.users</field>
+        <field name="arch" type="xml">
+            <search string="Search Opportunities">
+                <field name="name"/>
+                <field name="ou_id"/>
+                <field name="department_id"/>
+                <field name="title"/>
+                <field name="ip_phone"/>
+                <field name="email"/>
+                <separator/>
+                <filter string="Активные" name="inactive" domain="[('active', '=', True)]"/>
+                <filter string="Отключенные" name="inactive" domain="[('active', '=', False)]"/>
+                <filter string="Все" name="inactive" domain="['|',('active', '=', False), ('active', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="ad_users_view_form" model="ir.ui.view">
+        <field name="name">ad.users.form</field>
+        <field name="model">ad.users</field>
+        <field name="arch" type="xml">
+            <form string="Пользователь">
+                <header>
+                    <button name="action_update_from_ldap" type="object" string="Обновить из AD"/>
+                    
+                </header>
+                <sheet>
+                    <field name="photo" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title" style="width: 100%;">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="ФИО"/></h1>
+                        <label for="title" class="oe_edit_only"/>
+                        <h3><field name="title"/></h3>
+                    </div>
+                    <notebook>
+                    
+                        <page string="Основные">  
+                            <group col="6">
+
+                                <group string="Основные данные" colspan="4">
+                                    <field name="ou_id"/>
+                                    <field name="department_id"/>
+                                    <field name="is_ldap"/>
+                                    <field name="active"  widget="boolean_toggle"/>
+                                    <field name="employee_id"/>
+                                </group>
+
+                                <group string="Контакты" colspan="2">
+                                    <field name="ip_phone"/>
+                                    <field name="phone"/>
+                                    <field name="sec_phone"/>
+                                    <field name="email"/>
+                                </group>
+                                
+                            </group>
+
+                        </page>
+                        
+                        <page string="Техническая информация">  
+                            <group string="">
+                                <field name="username"/>
+                                <field name="distinguished_name"/>
+                                <field name="user_account_control"/>
+                                <field name="user_account_control_result"/>
+                                <field name="object_SID"/>
+                            </group>
+                        </page>
+                    </notebook>
+                    
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="ad_users_view_tree" model="ir.ui.view">
+        <field name="name">ad.users.tree</field>
+        <field name="model">ad.users</field>
+        <field name="arch" type="xml">
+            <!-- <tree string="Channel" editable="bottom"> -->
+            
+
+            <tree>
+                <field name="name"/>
+                <field name="title"/>
+                <field name="department_id"/>
+                <field name="ou_id"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+  
+
+    <!-- Configuration/Lead & Opportunities/Lost Reasons Menu -->
+    <record id="ad_users_action" model="ir.actions.act_window">
+        <field name="name">Пользователи AD</field>
+        <field name="res_model">ad.users</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+ 
+   
+</odoo>

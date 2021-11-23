@@ -1,0 +1,6 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_sync_wizard,access_sync_wizard,model_sync_wizard,base.group_erp_manager,1,1,1,1
+access_sync_log,access_sync_log,model_sync_log,base.group_erp_manager,1,1,1,1
+access_ad_connect,access_ad_connect,model_ad_connect,base.group_erp_manager,1,1,1,1
+access_zup_connect,access_zup_connect,model_zup_connect,base.group_erp_manager,1,1,1,1
+access_sync_tasks,access_sync_tasks,model_sync_tasks,base.group_erp_manager,1,1,1,1
