@@ -1,0 +1,55 @@
+<odoo>
+
+    <record id="db_sync_view_wizard" model="ir.ui.view">
+        <field name="name">Мастер Синхронизация БД</field>
+        <field name="model">db.sync_wizard</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <form>
+                <group col="4">
+                    <field name="server_id"/>
+                    <field name="user_id"/>
+
+                </group>
+                <group>
+                    <field name="result"/>
+                    
+                </group>
+
+                <footer>
+                    
+                    <button name="start_sync_action" string="Выполнить"
+                            type="object" class="oe_highlight"/>
+                    
+                    <button string="Отмена" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="db_sync_wizard_action" model="ir.actions.act_window">
+        <field name="name">Синхронизация БД</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">db.sync_wizard</field>
+        <field name="binding_view_types">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="db_sync_view_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <record id="db_sync_finish_wizard" model="ir.ui.view">
+        <field name="name">Синхронизация БД</field>
+        <field name="model">db.sync_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Synchronization Completed!" class="o_base_synchro_success">
+                <separator string="Синхронизация началась. Когда она завершиться, вам придет ответ."/>
+                <footer>
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    
+
+</odoo>

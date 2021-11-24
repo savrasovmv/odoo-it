@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_db_sync_server_manager,db.sync_server,model_db_sync_server,base.group_system,1,1,1,1
+access_db_sync_model_manager,db.sync_model,model_db_sync_model,base.group_system,1,1,1,1
+access_db_sync_model_relation_manager,db.sync_model_relation,model_db_sync_model_relation,base.group_system,1,1,1,1
+access_db_sync_model_field_manager,db.sync_model_field,model_db_sync_model_field,base.group_system,1,1,1,1
+access_db_sync_model_field_ignored_manager,db.sync_model_field_ignored,model_db_sync_model_field_ignored,base.group_system,1,1,1,1
+access_db_sync_obj_manager,db.sync_obj,model_db_sync_obj,base.group_system,1,1,1,1
+access_db_sync_wizard_manager,db.sync_wizard,model_db_sync_wizard,base.group_system,1,1,1,1
+access_db_sync_log_manager,db.sync_log,model_db_sync_log,base.group_system,1,1,1,1

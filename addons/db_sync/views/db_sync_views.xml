@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="db_sync_server_view_form" model="ir.ui.view">
+        <field name="name">db.sync_server.form</field>
+        <field name="model">db.sync_server</field>
+        <field name="arch" type="xml">
+            <form string="Сервер">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="server_url"/>
+                            <field name="server_port"/>
+                        </group>
+                        <group>
+                            <field name="db_name"/>
+                            <field name="login"/>
+                            <field name="password" password="True"/>
+                        </group>
+                    </group>
+                    
+                    <h3> Модели </h3>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="set_sequence_model"
+                            type="object"
+                            class="oe_stat_button oe_edit_only"
+                            icon="fa-refresh" string="Упорядочить"
+                            
+                            >
+                        </button>
+                    </div>
+                    <field name="sync_model_ids">
+                        <tree editable="botton">
+                            <field name="name"/>
+                            <field name="model"/>
+                            <field name="action"/>
+                            <field name="count_sync_field"/>
+                            <field name="sync_date"/>
+
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="db_sync_server_action" model="ir.actions.act_window">
+        <field name="name">Сервера</field>
+        <field name="res_model">db.sync_server</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+
+    <record id="db_sync_model_view_form" model="ir.ui.view">
+        <field name="name">db.sync_model.form</field>
+        <field name="model">db.sync_model</field>
+        <field name="arch" type="xml">
+            <form string="Модель">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="model"/>
+                            <field name="is_create"/>
+                            <field name="domain"/>
+                            <field name="is_active_obj"/>
+                            <field name="server_id"/>
+                            <field name="count_sync_field"/>
+                        </group>
+                        <group>
+                            <field name="ir_model_id"/>
+                            <field name="field_by_search"/>
+                            <field name="action" />
+                            <field name="sequence" />
+                            <field name="active" />
+                            <field name="sync_date" />
+                        </group>
+                    </group>
+                     <notebook>
+                    
+                        <page string="Поля"> 
+                            <div class="oe_button_box" name="button_box">
+                            <button name="action_set_field_ids"
+                                type="object"
+                                class="oe_stat_button oe_edit_only"
+                                icon="fa-refresh" string="Заполнить"
+                                
+                               >
+                            </button>
+                               <button name="action_create_relation_model"
+                                type="object"
+                                class="oe_stat_button oe_edit_only"
+                                icon="fa-refresh" string="Связать модели"
+                                
+                               >
+                            </button>
+                        </div>
+                            <field name="field_ids">
+                                <tree editable="botton">
+                                    <field name="name"/>
+                                    <field name="ir_model_field_id"/>
+                                    <field name="ttype"/>
+                                    <field name="field_description"/>
+                                    <field name="relation"/>
+                                    <field name="is_sync"/>
+                                    <field name="is_search"/>
+                                    <field name="is_create"/>
+                                    <field name="relation_sync_model_id"/>
+
+                                </tree>
+                            </field>
+
+                        </page>
+
+                        <page string="Зависимость"> 
+                            <field name="relation_sync_model_ids"/>
+
+                        </page>
+                     </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="db_sync_model_view_search" model="ir.ui.view">
+        <field name="name">db.sync_model.view.search</field>
+        <field name="model">db.sync_model</field>
+        <field name="arch" type="xml">
+            <search string="Search Opportunities">
+                <field name="name"/>
+                <separator/>
+                <filter string="Активные" name="inactive" domain="[('active', '=', True)]"/>
+                <filter string="Отключенные" name="notactive" domain="[('active', '=', False)]"/>
+                <filter string="Все" name="all" domain="['|',('active', '=', False), ('active', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="db_sync_model_view_tree" model="ir.ui.view">
+        <field name="name">db.sync_model.tree</field>
+        <field name="model">db.sync_model</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="count_sync_field == 0" decoration-muted="not active">
+                <field name="sequence"  widget="handle"/>
+                <field name="name"/>
+                <field name="model"/>
+                <field name="server_id"/>
+                <field name="count_sync_field"/>
+                <field name="ir_model_id"/>
+                <field name="sync_date" />
+                <field name="active" />
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="db_sync_model_action" model="ir.actions.act_window">
+        <field name="name">Модели</field>
+        <field name="res_model">db.sync_model</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{"search_default_all":1}</field>
+
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+    <record id="db_sync_obj_action" model="ir.actions.act_window">
+        <field name="name">Синхронизированные объекты</field>
+        <field name="res_model">db.sync_obj</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+
+
+    <record id="db_sync_log_view_tree" model="ir.ui.view">
+        <field name="name">db.sync_log.tree</field>
+        <field name="model">db.sync_log</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="is_error == True">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="server_id"/>
+                <field name="is_error"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="db_sync_log_action" model="ir.actions.act_window">
+        <field name="name">Результаты синхронизации</field>
+        <field name="res_model">db.sync_log</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+  
+   
+</odoo>
