@@ -144,7 +144,8 @@ class DbSyncModel(models.Model):
 
     @api.model
     def get_sync_obj_ids(self, action=None):
-        print("++++++++get_ids")
+        """Возвращает объекты модели для синхронизации"""
+
         domain = eval(self.domain)
 
         # Если нужно синхронизовать в том числе отключенные объекты

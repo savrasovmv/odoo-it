@@ -173,6 +173,20 @@
         </field>
     </record>
 
+
+    <record id="db_sync_obj_view_tree" model="ir.ui.view">
+        <field name="name">db.sync_obj.tree</field>
+        <field name="model">db.sync_obj</field>
+        <field name="arch" type="xml">
+            <tree >
+                <field name="name"/>
+                <field name="model"/>
+                <field name="local_id"/>
+                <field name="remote_id"/>
+            </tree>
+        </field>
+    </record>
+
     <record id="db_sync_obj_action" model="ir.actions.act_window">
         <field name="name">Синхронизированные объекты</field>
         <field name="res_model">db.sync_obj</field>
