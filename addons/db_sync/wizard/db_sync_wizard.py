@@ -160,7 +160,7 @@ class DbSyncWizard(models.TransientModel):
 
         if dist_obj_id:
             _logger.debug("Проверка существования объекта %s в удаленной БД по id= %s " % (obj_id, dist_obj_id))
-            res = pool_dist.get(sync_model_id.ir_model_id.model).search_read([['id', '=', dist_obj_id]], {'fields': ['id'], 'limit': 1})
+            res = pool_dist.get(sync_model_id.ir_model_id.model).search([['id', '=', dist_obj_id]])
             if len(res) == 0:
                 _logger.debug("Не найден объекта %s в удаленной БД по id= %s " % (obj_id, dist_obj_id))
                 _logger.debug("Удаляем зпись в Синхронизированные объекты(db.sync_obj) объекта %s" % (obj_id,))
@@ -179,14 +179,23 @@ class DbSyncWizard(models.TransientModel):
             self.count_update += 1
         else:
             
-            list_field_by_search = sync_model_id.field_by_search.split(' ')
+            # list_field_by_search = sync_model_id.field_by_search.split(' ')
+            # domain = []
+            # for field in list_field_by_search:
+            #     if isinstance(obj_id._fields[field], fields.Many2one):
+            #         field_value = self.get_remote_id_by_local_id(obj_id[field])
+            #     else:
+            #         field_value = obj_id[field]
+            #     domain.append((field, '=', field_value))
+
+            list_field_by_search = sync_model_id.get_search_field()
             domain = []
             for field in list_field_by_search:
-                if isinstance(obj_id._fields[field], fields.Many2one):
+                if field.ttype == 'Many2one':
                     field_value = self.get_remote_id_by_local_id(obj_id[field])
                 else:
-                    field_value = obj_id[field]
-                domain.append((field, '=', field_value))
+                    field_value = obj_id[field.name]
+                domain.append((field.name, '=', field_value))
             if len(domain)==0:
                 _logger.debug("Нет полей поиска соответствий для модели %s" % (sync_model_id))
                 self.text_error  = "Нет полей поиска соответствий для модели %s \n" % (sync_model_id)

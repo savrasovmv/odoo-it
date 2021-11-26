@@ -147,15 +147,18 @@ class DbSyncModel(models.Model):
         """Возвращает объекты модели для синхронизации"""
 
         domain = eval(self.domain)
+        model_obj = self.env[self.ir_model_id.model]
+
+        # print("++++++++++self._fields",model_obj._fields)
+        # print("++++++++++self.fields_get()",model_obj.fields_get())
 
         # Если нужно синхронизовать в том числе отключенные объекты
-        if not self.is_active_obj:
+        if not self.is_active_obj and 'active' in model_obj._fields:
             domain += [
                 '|',
                 ('active', '=', True),
                 ('active', '=', False),
             ]
-        model_obj = self.env[self.ir_model_id.model]
         if self.sync_date:
             w_date = domain + [("write_date", ">=", self.sync_date)]
             c_date = domain + [("create_date", ">=", self.sync_date)]
@@ -177,6 +180,16 @@ class DbSyncModel(models.Model):
         fields = self.field_ids.search([
             ('sync_model_id', '=', self.id),
             ('is_sync', '=', True),
+        ])
+
+        return fields
+
+    @api.model
+    def get_search_field(self):
+        """Возвращает поля отмеченные как поисковые, по которым будет идти поиск в удаленной БД """
+        fields = self.field_ids.search([
+            ('sync_model_id', '=', self.id),
+            ('is_search', '=', True),
         ])
 
         return fields
