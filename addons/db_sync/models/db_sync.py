@@ -24,22 +24,19 @@ class DbSyncServer(models.Model):
         """Проход по моделям и установка Порядка для зависимых моделий ниже от зависимых"""
         child = False
         for sync_model in self.sync_model_ids:
-            # print("++++sync_model", sync_model.name)
+
             if sync_model.sequence>sequence:
+              
                 if sync_model.relation_sync_model_ids:
                     
                     for rel_model in sync_model.relation_sync_model_ids:
-                        # print("++++rel_model", rel_model.name)
+
                         pet = False
                         #  Проверяем не петля ли, т.е не взаимозависимые модели
                         for rel_rel in rel_model.relation_sync_model_id.relation_sync_model_ids:
                             if rel_rel.sync_model_id.id == sync_model.id:
                                 pet = True
 
-                        
-                        # print("++++pet", pet)
-                        # print("++++rel_model.relation_sync_model_id.sequence", rel_model.relation_sync_model_id.sequence)
-                        # print("++++sync_model.sequence", sync_model.sequence)
                         # Если у зависимой модели порядок меньше или равен порядку связанной и не петля, то увелииваем порядок
                         if rel_model.relation_sync_model_id.sequence>=sync_model.sequence and not pet:
                             # print("++++child=True")
@@ -50,8 +47,6 @@ class DbSyncServer(models.Model):
             return True
         else:
             return False
-                    
-
 
 
     def set_sequence_model(self):
@@ -143,14 +138,29 @@ class DbSyncModel(models.Model):
             self.field_ids.create(vals)
 
     @api.model
+    def get_defaul_domain(self):
+        """Возврощает поисковой домен по умолчани. Домен = Домен указанный в форме + Все записи, если есть поле Active"""
+        
+        domain = eval(self.domain)
+        model_obj = self.env[self.ir_model_id.model]
+
+        # Если нужно синхронизовать в том числе отключенные объекты
+        if 'active' in model_obj._fields:
+            domain += [
+                '|',
+                ('active', '=', True),
+                ('active', '=', False),
+            ]
+
+        return domain
+
+
+    @api.model
     def get_sync_obj_ids(self, action=None):
         """Возвращает объекты модели для синхронизации"""
 
         domain = eval(self.domain)
         model_obj = self.env[self.ir_model_id.model]
-
-        # print("++++++++++self._fields",model_obj._fields)
-        # print("++++++++++self.fields_get()",model_obj.fields_get())
 
         # Если нужно синхронизовать в том числе отключенные объекты
         if not self.is_active_obj and 'active' in model_obj._fields:
@@ -208,22 +218,19 @@ class DbSyncModel(models.Model):
     
     def action_create_relation_model(self):
         """Создать связи с зависимыми моделями в строках полей"""
+
         fields = self.field_ids.search([
             ('relation', '!=', ''),
             ('is_sync', '=', True),
         ])
 
         for field in fields:
-            print("++++",field)
-            print("++++",field.ir_model_field_id)
             res = self.env['db.sync_model'].search([
                 ('model', '=', field.relation)
             ])
             if res:
-                print("=======", res)
                 field.relation_sync_model_id = res.id
             else:
-                print("-------",field.relation)
                 ir_model = self.env['ir.model'].search([
                     ('model', '=', field.relation)
                 ])
@@ -234,11 +241,12 @@ class DbSyncModel(models.Model):
                     }
                     new_id = self.env['db.sync_model'].create(vals)
                     field.relation_sync_model_id = new_id.id
-                    print("++++new_id", new_id)
-                else:
-                    print("Модель в ir.model не найдена")
+                # else:
+                #     print("Модель в ir.model не найдена")
         
         self.action_update_relation_model()
+
+
 
 class DbSyncModelRelation(models.Model):
     """Зависимости Модели БД для синхронизации"""
@@ -318,8 +326,6 @@ class DbSyncObj(models.Model):
         return False
 
         
-
-
 
 class DbSyncLog(models.Model):
     """Результат синхронизации"""

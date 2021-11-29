@@ -11,14 +11,23 @@
                     <field name="user_id"/>
 
                 </group>
+                <div class="text-muted">Проверять существует ли объект в удаленной базе, перед тем как обновлять его. Если не проверять и объекта в УдБД не существует, то при обновлении объекта методом write объект в удаленной базе не создаться.
+        Если проверять то это дополнительный вызов, что увеличивает нагрузку </div>
                 <group>
-                    <field name="result"/>
+                    <field name="is_check_obj" string="Проверять объекты"/>
+                    
+                </group>
+                <group>
+                    <field name="result" />
                     
                 </group>
 
                 <footer>
                     
-                    <button name="start_sync_action" string="Выполнить"
+                    <button name="start_sync_action" string="Синхронизовать"
+                            type="object" class="oe_highlight"/>
+
+                    <button name="start_check_sync_action" string="Проверка и восстановление"
                             type="object" class="oe_highlight"/>
                     
                     <button string="Отмена" class="oe_link" special="cancel"/>

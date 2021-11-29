@@ -84,6 +84,8 @@ class DbSyncWizard(models.TransientModel):
     count_create = fields.Integer(string='Кол-во созданных объектов', default=0)
     count_update = fields.Integer(string='Кол-во обновленных объектов', default=0)
 
+    is_check_obj = fields.Boolean(string='Проверять существование объекта в удаленной базе')
+
     
     def get_remote_id_by_local_id(self, obj_id):
         """Ищит была ли ранее синхронизация, возвращает id запись удаленной базы"""
@@ -158,7 +160,10 @@ class DbSyncWizard(models.TransientModel):
             return       
                 
 
-        if dist_obj_id:
+        # Проверять существутет ли объект в Удаленной БД
+        # Если не проверять и объекта в УдБД не существует, то при обновлении объекта методом write объект в удаленной базе не создаться
+        # Если проверять то это дополнительный вызов, что увеличивает нагрузку
+        if dist_obj_id and self.is_check_obj:
             _logger.debug("Проверка существования объекта %s в удаленной БД по id= %s " % (obj_id, dist_obj_id))
             res = pool_dist.get(sync_model_id.ir_model_id.model).search([['id', '=', dist_obj_id]])
             if len(res) == 0:
@@ -303,42 +308,42 @@ class DbSyncWizard(models.TransientModel):
     def start_sync_action(self):
         """События Wizard начать синхронизацию"""
 
-        # _logger.debug("События Wizard начать синхронизацию")
+        _logger.debug("События Wizard начать синхронизацию")
 
-        # _logger.debug("Проверка доступности удаленного сервера %s", self.server_id.name)
-        # pool_dist = RPCProxy(self.server_id)
-        # _logger.debug("Запрос версии сервера")
-        # res = pool_dist.test_connection()
-        # if res:
-        #     _logger.debug("Версия сервера %s", res)
-        # else:
-        #     _logger.warning("Ошибка подключения к удаленному серверу %s", self.server_id.name)
-        #     self.text_error  = "Ошибка подключения к удаленному серверу %s \n", self.server_id.name
-        #     self.count_error += 1
+        _logger.debug("Проверка доступности удаленного сервера %s", self.server_id.name)
+        pool_dist = RPCProxy(self.server_id)
+        _logger.debug("Запрос версии сервера")
+        res = pool_dist.test_connection()
+        if res:
+            _logger.debug("Версия сервера %s", res)
+        else:
+            _logger.warning("Ошибка подключения к удаленному серверу %s", self.server_id.name)
+            self.text_error  = "Ошибка подключения к удаленному серверу %s \n", self.server_id.name
+            self.count_error += 1
 
-        #     log = self.env["db.sync_log"]
+            log = self.env["db.sync_log"]
             
-        #     log.create(
-        #         {
-        #             "name": "Отчет о синхронизации",
-        #             "date": fields.Datetime.now(),
-        #             "server_id": self.server_id.id,
-        #             "result": "Ошибка подключения к удаленному серверу",
-        #             "is_error": True
-        #         }
-        #     )
-        #     self.result = "Ошибка подключения к удаленному серверу"
-        #     notification = {
-        #         'type': 'ir.actions.client',
-        #         'tag': 'display_notification',
-        #         'params': {
-        #             'title': ('Прерванно'),
-        #             'message': self.result,
-        #             'type':'warning',  #types: success,warning,danger,info
-        #             'sticky': False,  #True/False will display for few seconds if false
-        #         },
-        #     }
-        #     return notification
+            log.create(
+                {
+                    "name": "Отчет о синхронизации",
+                    "date": fields.Datetime.now(),
+                    "server_id": self.server_id.id,
+                    "result": "Ошибка подключения к удаленному серверу",
+                    "is_error": True
+                }
+            )
+            self.result = "Ошибка подключения к удаленному серверу"
+            notification = {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': ('Прерванно'),
+                    'message': self.result,
+                    'type':'warning',  #types: success,warning,danger,info
+                    'sticky': False,  #True/False will display for few seconds if false
+                },
+            }
+            return notification
 
 
         threaded_sync = threading.Thread(
@@ -346,13 +351,140 @@ class DbSyncWizard(models.TransientModel):
         )
         threaded_sync.start()
 
-        id2 = self.env.ref("db_sync.db_sync_finish_wizard").id
         return {
-            "binding_view_types": "form",
-            "view_mode": "form",
-            "res_model": "db.sync_wizard",
-            "views": [(id2, "form")],
-            "view_id": False,
-            "type": "ir.actions.act_window",
-            "target": "new",
-        }
+				'name': 'Результат',
+				'type': 'ir.actions.act_window',
+				'view_type': 'form',
+				'view_mode': 'form',
+				'res_model': 'db.sync_wizard',
+				'target':'new',
+				'context':{
+							'default_result':self.result,
+							} 
+				}
+
+        # id2 = self.env.ref("db_sync.db_sync_finish_wizard").id
+        # return {
+        #     "binding_view_types": "form",
+        #     "view_mode": "form",
+        #     "res_model": "db.sync_wizard",
+        #     "views": [(id2, "form")],
+        #     "view_id": False,
+        #     "type": "ir.actions.act_window",
+        #     "target": "new",
+        # }
+
+
+
+
+
+    def check_sync_model(self, sync_model_id):
+        """Проверка модели"""
+
+        pool_dist = RPCProxy(self.server_id)
+
+        obj_ids = self.env['db.sync_obj'].search([
+            ('sync_model_id', '=', sync_model_id.id)
+        ])
+
+        print("++++++ Модель ", sync_model_id.model)
+
+        local_ids = [k.local_id for k in obj_ids]
+        remote_ids = [k.remote_id for k in obj_ids]
+
+        print("++++++ local_ids ", local_ids)
+        print("++++++ len(local_ids)", len(local_ids))
+
+        print("++++++ remote_ids ", remote_ids)
+
+
+        domain = sync_model_id.get_defaul_domain()
+
+        local_obj_ids = self.env[sync_model_id.model].search(domain + [('id', 'in', local_ids)])
+        print("++++++ len(local_obj_ids)", len(local_obj_ids))
+
+        remote_obj_ids = pool_dist.get(sync_model_id.model).search(domain + [('id', 'in', remote_ids)])
+        print("++++++ len(remote_obj_ids)", len(remote_obj_ids))
+
+        #  Сравнение двух списков
+        # https://ru.stackoverflow.com/questions/427942/%D0%A1%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5-2-%D1%83%D1%85-%D1%81%D0%BF%D0%B8%D1%81%D0%BA%D0%BE%D0%B2-%D0%B2-python
+
+        # model_ids = request.env[model_name].search([], offset=(page - 1) * 10, limit=10)
+        # total = model_ids.search_count([])
+        # pager = request.website.pager(
+        #             url='url path',
+        #             total=total,
+        #             page=page,
+        #             step=10,
+        #         )
+
+
+
+
+    def start_check_sync(self):
+        """Выборка моделий для проверки. Запуск процедуры проверки модели"""
+        for sync_model_id in self.server_id.sync_model_ids:
+            _logger.debug("Проверка модели  %s, порядок %s" % (sync_model_id.name, sync_model_id.sequence))
+            self.check_sync_model(sync_model_id)
+
+
+
+
+
+    def start_check_sync_action(self):
+        """События Wizard Проверяет синхронизированные объекты и восстанавляивает в случае отсутствия"""
+
+        _logger.debug("События Wizard начать проверку синхронизированных объектов")
+
+        _logger.debug("Проверка доступности удаленного сервера %s", self.server_id.name)
+        pool_dist = RPCProxy(self.server_id)
+        _logger.debug("Запрос версии сервера")
+        res = pool_dist.test_connection()
+        if res:
+            _logger.debug("Версия сервера %s", res)
+        else:
+            _logger.warning("Ошибка подключения к удаленному серверу %s", self.server_id.name)
+            self.text_error  = "Ошибка подключения к удаленному серверу %s \n", self.server_id.name
+            self.count_error += 1
+
+            log = self.env["db.sync_log"]
+            
+            log.create(
+                {
+                    "name": "Отчет о синхронизации",
+                    "date": fields.Datetime.now(),
+                    "server_id": self.server_id.id,
+                    "result": "Ошибка подключения к удаленному серверу",
+                    "is_error": True
+                }
+            )
+            self.result = "Ошибка подключения к удаленному серверу"
+            notification = {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': ('Прерванно'),
+                    'message': self.result,
+                    'type':'warning',  #types: success,warning,danger,info
+                    'sticky': False,  #True/False will display for few seconds if false
+                },
+            }
+            return notification
+
+
+        threaded_sync = threading.Thread(
+            target=self.start_check_sync()
+        )
+        threaded_sync.start()
+
+        return {
+				'name': 'Результат',
+				'type': 'ir.actions.act_window',
+				'view_type': 'form',
+				'view_mode': 'form',
+				'res_model': 'db.sync_wizard',
+				'target':'new',
+				'context':{
+							'default_result':self.result,
+							} 
+				}

@@ -16,12 +16,10 @@ _logger = logging.getLogger(__name__)
 def get_date(date_text):
     """Возвращает форматированную дату если она не пуста, т.е не равна 0001-01-01T00:00:00"""
     date = False
-    print('date_text=',date_text)
 
     if date_text != '0001-01-01T00:00:00' and date_text !='':
-        print('date_text=',date_text)
         date = datetime.strptime(date_text, '%Y-%m-%dT%H:%M:%S').date()
-    print(date_text, date)
+
     return date
 
 
@@ -144,7 +142,7 @@ class ZupSyncDep(models.AbstractModel):
     def zup_sync_dep(self):
         """Загрузка информации по подразделениям из ЗУП"""
 
-        _logger.info("Загрузка информации по подразделениям из ЗУП zup_sync_dep")
+        _logger.debug("Загрузка информации по подразделениям из ЗУП zup_sync_dep")
 
         date = datetime.today()
         URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_dep_list')
@@ -204,8 +202,23 @@ class ZupSyncDep(models.AbstractModel):
                 }
 
                 if len(record_search)>0:
-                    message_update += name + '\n'
-                    record_search.write(vals)
+                    is_update = False # Нужно ли обновлять
+                    record_vals = {
+                        'name': record_search.name,
+                        'guid_1c': record_search.guid_1c,
+                        'code_1c': record_search.code_1c,
+                        'manager_id': record_search.manager_id.id,
+                        'parent_id': record_search.parent_id.id,
+                    }
+                    
+                    for key in vals:
+                        if vals[key] != record_vals[key]:
+                            is_update = True
+                            break # Прерываем цикл. Значения не совпадают значит нужно обновить
+                    
+                    if is_update:
+                        message_update += name + '\n'
+                        record_search.write(vals)
                 else:
                     n +=1
                     message_create += name + '\n'
@@ -239,7 +252,7 @@ class ZupSyncEmployer(models.AbstractModel):
     def zup_sync_employer(self, by_guid_1c=False):
         """Загрузка информации по Сотрудникам из ЗУП"""
 
-        _logger.info("Загрузка информации по Сотрудникам из ЗУП zup_sync_employer")
+        _logger.debug("Загрузка информации по Сотрудникам из ЗУП zup_sync_employer")
 
         date = datetime.today()
 
@@ -302,9 +315,13 @@ class ZupSyncEmployer(models.AbstractModel):
             # 'position': 'Ведущий инженер'}
         for line in data:
             if 'name' in line and 'guid1C' in line and 'departament' in line and 'position' in line:
+
+
                 name = line['name'] 
                 guid_1c = line['guid1C']
                 
+                _logger.debug("Сотрудник: %s" % name)
+
                 #Подразделение
                 department_guid_1c = line['departament']
                 department = self.env['hr.department'].search([
@@ -383,8 +400,30 @@ class ZupSyncEmployer(models.AbstractModel):
                 }
 
                 if len(record_search)>0:
-                    message_update += name + '\n'
-                    record_search.write(vals)
+                    is_update = False # Нужно ли обновлять
+                    record_vals = {
+                        'name': record_search.name,
+                        'guid_1c': record_search.guid_1c,
+                        'department_id': record_search.department_id.id,
+                        'job_title': record_search.job_title,
+                        'birthday': record_search.birthday,
+                        'service_start_date': record_search.service_start_date,
+                        'gender': record_search.gender,
+                        'country_id': record_search.country_id.id,
+                        'personal_email': record_search.personal_email,
+                        'employment_type_1c': record_search.employment_type_1c,
+                        'number_1c': record_search.number_1c,
+                        'parent_id': record_search.parent_id.id,
+                    }
+                    
+                    for key in vals:
+                        if vals[key] != record_vals[key]:
+                            is_update = True
+                            break # Прерываем цикл. Значения не совпадают значит нужно обновить
+                    
+                    if is_update:
+                        message_update += name + '\n'
+                        record_search.write(vals)
                 else:
                     n +=1
                     message_create += name + '\n'
@@ -492,7 +531,7 @@ class ZupSyncPassport(models.AbstractModel):
         
         """
 
-        _logger.info("Загрузка информации по удостоверениям личности и адресам Сотрудников из ЗУП zup_sync_passport")
+        _logger.debug("Загрузка информации по удостоверениям личности и адресам Сотрудников из ЗУП zup_sync_passport")
 
         date = datetime.today()
         URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_passport_list')
@@ -670,7 +709,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
     def zup_sync_personal_doc_full(self, date_start=False, date_end=False):
         """Загрузка всех типов документов"""
 
-        _logger.info("Загрузка всех типов документов zup_sync_personal_doc_full")
+        _logger.debug("Загрузка всех типов документов zup_sync_personal_doc_full")
 
         if not date_start or not date_end:
             raise Exception("Не указан период для синхронизации")
@@ -691,6 +730,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
             try:
                 result += self.zup_sync_personal_doc(doc_obj=doc_obj, date_start=date_start, date_end=date_end)
             except Exception as error:
+                _logger.warning("Ошибка zup_sync_personal_doc_full %s" % str(error))
                 self.create_ad_log(date=date,result=str(error), is_error=True)
                 raise error
 
@@ -717,7 +757,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         
         """
 
-        _logger.info("Загрузка документов ЗУП zup_sync_personal_doc")
+        _logger.debug("Загрузка документов ЗУП zup_sync_personal_doc")
 
         if not date_start or not date_end or not date_end:
             raise Exception("Не указан период или объект для синхронизации")
@@ -791,7 +831,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         for line in data:
             # print(line)
             if 'guid1C' in line:
-                print(line)
+                # print(line)
                 
                 guid_1c = line['guid1C'] # Идентификатор документа
 
@@ -864,7 +904,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                         ('guid_1c', '=', guid_1c)
                     ],limit=1)
                 if len(doc_search)>0:
-                    print(vals)
+                    # print(vals)
                     doc_search.write(vals)
                     message_update += line['number'] + ' от ' + line['documentDate'] + '\n'
 
@@ -903,7 +943,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         """Загрузка документов групповых переводов ЗУП
         
         """
-        _logger.info("Загрузка документов групповых переводов ЗУП zup_sync_multi_transfer_doc")
+        _logger.debug("Загрузка документов групповых переводов ЗУП zup_sync_multi_transfer_doc")
 
         if not data:
             raise Exception("Нет данных для синхронизации")
@@ -1009,7 +1049,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
 
     def update_personal_doc(self, doc_obj, data, create_employer=False):
 
-        _logger.info("Обновление персональных документв ЗУП update_personal_doc")
+        _logger.debug("Обновление персональных документв ЗУП update_personal_doc")
 
         message_update = ''
         message_create = ''
@@ -1192,7 +1232,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         
         """
 
-        _logger.info("Загрузка измененных документов из ЗУП zup_sync_personal_doc_change")
+        _logger.debug("Загрузка измененных документов из ЗУП zup_sync_personal_doc_change")
 
         date = datetime.today()
 
@@ -1230,7 +1270,8 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         message_create = ''
         guid_change_doc_list = []
         for type_doc in data:
-            print(type_doc)
+            _logger.debug("Тип документа: %s" % type_doc)
+
             doc_obj = False
                            
             if type_doc == 'recruitmentDocumentList':
@@ -1264,7 +1305,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                     guid_1c = line['guid1C']
                     n += 1
                     if type_doc == 'multipleTransferDocumentList':
-                        print(line)
+                        # print(line)
                         result_doc = self.zup_sync_multi_transfer_doc(data=line, is_def_change=True)
                     else:
                         result_doc = self.update_personal_doc(doc_obj=doc_obj, data=line, create_employer=True)
@@ -1295,7 +1336,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
 
         self.create_ad_log(result=result)
 
-        print(guid_change_doc_list)
+        # print(guid_change_doc_list)
 
         param = {
             "documentList": guid_change_doc_list
