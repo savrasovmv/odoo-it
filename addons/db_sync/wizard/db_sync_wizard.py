@@ -78,11 +78,18 @@ class DbSyncWizard(models.TransientModel):
         "res.users", "Отправить результат", default=lambda self: self.env.user
     )
 
-    result = fields.Text(string='Результат')
-    text_error = fields.Text(string='Результат')
+    result = fields.Text(string='Результат', default='')
+    text_error = fields.Text(string='Текст ошибок', default='')
+    text_create = fields.Text(string='Результат создания', default='')
+    text_update = fields.Text(string='Результат обновления', default='')
+
     count_error = fields.Integer(string='Кол-во ошибок', default=0)
     count_create = fields.Integer(string='Кол-во созданных объектов', default=0)
     count_update = fields.Integer(string='Кол-во обновленных объектов', default=0)
+    
+    count_check_del_line = fields.Integer(string='Удалено строк obj_sync', default=0)
+    count_check_del_remote = fields.Integer(string='Удалено в Удаленной БД', default=0)
+    count_check_create_remote = fields.Integer(string='Создано в Удаленной БД', default=0)
 
     is_check_obj = fields.Boolean(string='Проверять существование объекта в удаленной базе')
 
@@ -122,8 +129,10 @@ class DbSyncWizard(models.TransientModel):
 
     
     
-    def sync_obj(self, sync_model_id, obj_id):
-        """Синхронизация конкретных объектов модели"""
+    def sync_obj(self, sync_model_id, obj_id, is_check=False):
+        """Синхронизация конкретных объектов модели
+            is_check - признак выполнения проверки
+        """
 
         _logger.debug("Синхронизация объекта %s",  obj_id)
         pool_dist = RPCProxy(self.server_id)
@@ -163,7 +172,7 @@ class DbSyncWizard(models.TransientModel):
         # Проверять существутет ли объект в Удаленной БД
         # Если не проверять и объекта в УдБД не существует, то при обновлении объекта методом write объект в удаленной базе не создаться
         # Если проверять то это дополнительный вызов, что увеличивает нагрузку
-        if dist_obj_id and self.is_check_obj:
+        if dist_obj_id and (self.is_check_obj or is_check):
             _logger.debug("Проверка существования объекта %s в удаленной БД по id= %s " % (obj_id, dist_obj_id))
             res = pool_dist.get(sync_model_id.ir_model_id.model).search([['id', '=', dist_obj_id]])
             if len(res) == 0:
@@ -181,6 +190,7 @@ class DbSyncWizard(models.TransientModel):
         if dist_obj_id:
             _logger.debug("Обновление объекта %s в удаленной БД с id= %s и vals=%s" % (obj_id, dist_obj_id, vals))
             res = pool_dist.get(sync_model_id.ir_model_id.model).write([dist_obj_id], vals)
+            self.text_update += '%s %s -> %s \n' % (obj_id, obj_id.display_name, dist_obj_id)
             self.count_update += 1
         else:
             
@@ -218,12 +228,16 @@ class DbSyncWizard(models.TransientModel):
                 _logger.debug("Найден. Обновление объекта %s в удаленной БД с id= %s" % (obj_id, new_id))
                 pool_dist.get(sync_model_id.ir_model_id.model).write([new_id], vals)
                 self.count_update += 1
+                self.text_update += '%s %s -> %s \n' % (obj_id, obj_id.display_name, new_id)
+
                 
             else:
                 _logger.debug("Не найден. Создание нового объекта %s в удаленной БД " % (obj_id, ))
                 new_id = pool_dist.get(sync_model_id.ir_model_id.model).create(vals)
                 _logger.debug("Создан новый объекта %s в удаленной БД с id = %s" % (obj_id, new_id))
                 self.count_create += 1
+                self.text_create += '%s %s -> %s \n' % (obj_id, obj_id.display_name, new_id)
+
 
 
             self.create_sync_obj(sync_model_id, obj_id.id, new_id)
@@ -268,6 +282,8 @@ class DbSyncWizard(models.TransientModel):
         self.ensure_one()
         _logger.debug("Начало синхронизации. Выборка моделей для синхронизации и их синхронизация")
 
+        self.text_update=self.text_create=self.text_error=''
+
         for sync_model_id in self.server_id.sync_model_ids:
             _logger.debug("Начало синхронизации модели  %s, порядок %s" % (sync_model_id.name, sync_model_id.sequence))
             self.sync_model(sync_model_id)
@@ -285,13 +301,23 @@ class DbSyncWizard(models.TransientModel):
                 Создано: %s, \n
                 Ошибок: %s, \n
                 Текст ошибок: \n
-                %s
+                %s \n \n
+                ------------------------------------ \n
+                Подробности: \n
+                ------------------------------------ \n
+                Обновлены объекты: \n 
+                %s, \n
+                Созданы объекты: \n
+                %s, \n
+
             
             """ % (
                 self.count_update,
                 self.count_create,
                 self.count_error,
                 self.text_error if self.text_error else '',
+                self.text_update if self.text_update else '',
+                self.text_create if self.text_create else '',
             )
             
             log.create(
@@ -383,49 +409,89 @@ class DbSyncWizard(models.TransientModel):
 
         pool_dist = RPCProxy(self.server_id)
 
+        # ----------------------------------------------
+        # Проверка локальных объектов
+        # ----------------------------------------------
+
         obj_ids = self.env['db.sync_obj'].search([
             ('sync_model_id', '=', sync_model_id.id)
         ])
 
-        print("++++++ Модель ", sync_model_id.model)
-
         local_ids = [k.local_id for k in obj_ids]
-        remote_ids = [k.remote_id for k in obj_ids]
-
-        print("++++++ local_ids ", local_ids)
-        print("++++++ len(local_ids)", len(local_ids))
-
-        print("++++++ remote_ids ", remote_ids)
-
-
         domain = sync_model_id.get_defaul_domain()
 
         local_obj_ids = self.env[sync_model_id.model].search(domain + [('id', 'in', local_ids)])
-        print("++++++ len(local_obj_ids)", len(local_obj_ids))
+        db_local_ids = [k.id for k in local_obj_ids]
 
-        remote_obj_ids = pool_dist.get(sync_model_id.model).search(domain + [('id', 'in', remote_ids)])
-        print("++++++ len(remote_obj_ids)", len(remote_obj_ids))
+        # Список id существующей в Синхронизированные объекты db.sync_obj, но не существующие в текущей БД
+        # Очищаем список и удаляем объекты в удаленной БД если они существуют
+        list_del_local = list(set(local_ids) - set(db_local_ids))
 
-        #  Сравнение двух списков
-        # https://ru.stackoverflow.com/questions/427942/%D0%A1%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5-2-%D1%83%D1%85-%D1%81%D0%BF%D0%B8%D1%81%D0%BA%D0%BE%D0%B2-%D0%B2-python
+        if len(list_del_local)>0:
+            # Нахоим ID удаленной БД для последующего удаления
+            search_del_obj_ids = self.env['db.sync_obj'].search([
+                ('sync_model_id', '=', sync_model_id.id),
+                ('local_id', 'in', list_del_local)
+            ])
+            list_del_remote_ids = [k.remote_id for k in search_del_obj_ids]
+            
+            self.count_check_del_line += len(search_del_obj_ids) 
+            self.count_check_del_remote += len(list_del_remote_ids) 
 
-        # model_ids = request.env[model_name].search([], offset=(page - 1) * 10, limit=10)
-        # total = model_ids.search_count([])
-        # pager = request.website.pager(
-        #             url='url path',
-        #             total=total,
-        #             page=page,
-        #             step=10,
-        #         )
+            # Выбираем существующие в УдБД объекты входящие в список для удаления
+            remote_ids = pool_dist.get(sync_model_id.model).search([('id', 'in', list_del_remote_ids)])
+            # Удаляем записи в БД
+            pool_dist.get(sync_model_id.model).unlink(remote_ids)
+            search_del_obj_ids.unlink()
+
+
+
+
+        # ----------------------------------------------
+        # Проверка объектов в УдБД
+        # ----------------------------------------------
+        obj_ids = self.env['db.sync_obj'].search([
+            ('sync_model_id', '=', sync_model_id.id)
+        ])
+
+        remote_ids = [k.remote_id for k in obj_ids]
+
+        db_remote_ids = pool_dist.get(sync_model_id.model).search([('id', 'in', remote_ids)])
+
+        # Список id существующей в Синхронизированные объекты db.sync_obj, но не существующие в Удаленной БД
+        # Создаем объекты в удаленной БД если они отсутствуют
+        list_create_remote_obj_id = list(set(remote_ids) - set(db_remote_ids))
+
+        if len(list_create_remote_obj_id)>0:
+            # Нахоим объекты которые нужно создать в УдБД
+            search_create_obj_ids = self.env['db.sync_obj'].search([
+                ('sync_model_id', '=', sync_model_id.id),
+                ('remote_id', 'in', list_create_remote_obj_id)
+            ])
+
+            # Id объектов которые необходимо создать в УдБД
+            local_ids = [k.local_id for k in search_create_obj_ids]
+
+            # Получаем конкретные объекты модели для синхронизации
+            sync_obj_ids = self.env[sync_model_id.model].search([('id', 'in', local_ids)])
+
+            # Синхронизируем
+            for obj_id in sync_obj_ids:
+                self.sync_obj(sync_model_id, obj_id, True)
 
 
 
 
     def start_check_sync(self):
         """Выборка моделий для проверки. Запуск процедуры проверки модели"""
+
+        self.text_update=self.text_create=self.text_error=''
+
         for sync_model_id in self.server_id.sync_model_ids:
             _logger.debug("Проверка модели  %s, порядок %s" % (sync_model_id.name, sync_model_id.sequence))
             self.check_sync_model(sync_model_id)
+        
+        self.create_log_check()
 
 
 
@@ -451,7 +517,7 @@ class DbSyncWizard(models.TransientModel):
             
             log.create(
                 {
-                    "name": "Отчет о синхронизации",
+                    "name": "Отчет о проверке",
                     "date": fields.Datetime.now(),
                     "server_id": self.server_id.id,
                     "result": "Ошибка подключения к удаленному серверу",
@@ -488,3 +554,42 @@ class DbSyncWizard(models.TransientModel):
 							'default_result':self.result,
 							} 
 				}
+
+    def create_log_check(self):
+        if self.user_id:
+            log = self.env["db.sync_log"]
+            self.result = """
+                Результаты проверки: \n
+                Удалено строк Синхронизированные объекты db.sync_obj: %s, \n
+                Удалено в Удаленной БД: %s, \n
+                Создано в Удаленной БД: %s, \n
+                Ошибок: %s, \n
+                Текст ошибок: \n
+                %s \n
+                ------------------------------------ \n
+                Подробности: \n
+                ------------------------------------ \n
+                Обновлены объекты: \n 
+                %s, \n
+                Созданы объекты: \n
+                %s, \n
+            
+            """ % (
+                self.count_check_del_line,
+                self.count_check_del_remote,
+                self.count_create,
+                self.count_error,
+                self.text_error if self.text_error else '',
+                self.text_update if self.text_update else '',
+                self.text_create if self.text_create else '',
+            )
+            
+            log.create(
+                {
+                    "name": "Отчет о проверки",
+                    "date": fields.Datetime.now(),
+                    "server_id": self.server_id.id,
+                    "result": self.result,
+                    "is_error": False if self.count_error==0 else True
+                }
+            )
