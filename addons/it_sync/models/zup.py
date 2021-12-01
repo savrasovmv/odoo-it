@@ -118,7 +118,7 @@ class ZupConnect(models.AbstractModel):
             return True
 
 
-    def create_ad_log(self, date=False, is_error=False, result=''):
+    def create_sync_log(self, date=False, is_error=False, result=''):
         """Создает запись в журнале синхронизации с AD"""
         if not date:
             date = datetime.today()
@@ -154,18 +154,18 @@ class ZupSyncDep(models.AbstractModel):
                                     url_api=URL_API
                                 )
         except Exception as error:
-            self.create_ad_log(date=date,result=error, is_error=True)
+            self.create_sync_log(date=date,result=error, is_error=True)
             raise error
 
         if res:
             total_entries, data = res
         else:
-            self.create_ad_log(date=date,result='Ошибка. Данные не получены', is_error=True)
+            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
             raise Exception('Ошибка. Данные не получены')
         
         if total_entries == 0:
             result = "Новых данных нет"
-            self.create_ad_log(result=result)
+            self.create_sync_log(result=result)
             return result
         
         n = 0
@@ -240,7 +240,7 @@ class ZupSyncDep(models.AbstractModel):
         if not message_update == '':
             result += "\n Обновлены Подразделения: \n" + message_update
 
-        self.create_ad_log(result=result)
+        self.create_sync_log(result=result)
 
         return result
 
@@ -277,7 +277,7 @@ class ZupSyncEmployer(models.AbstractModel):
                                     url_api=URL_API
                                 )
         except Exception as error:
-            self.create_ad_log(date=date,result=error, is_error=True)
+            self.create_sync_log(date=date,result=error, is_error=True)
             raise error
 
         total_entries = 0
@@ -289,12 +289,12 @@ class ZupSyncEmployer(models.AbstractModel):
             else:
                 total_entries, data = res
         else:
-            self.create_ad_log(date=date,result='Ошибка. Данные не получены', is_error=True)
+            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
             raise Exception('Ошибка. Данные не получены')
         
         if total_entries == 0:
             result = "Новых данных нет"
-            self.create_ad_log(result=result)
+            self.create_sync_log(result=result)
             return result
         
         n = 0
@@ -445,7 +445,7 @@ class ZupSyncEmployer(models.AbstractModel):
         if not message_update == '':
             result += "\n Обновлены Сотрудники: \n" + message_update
 
-        self.create_ad_log(result=result)
+        self.create_sync_log(result=result)
 
         return result
 
@@ -543,18 +543,18 @@ class ZupSyncPassport(models.AbstractModel):
                                     url_api=URL_API
                                 )
         except Exception as error:
-            self.create_ad_log(date=date,result=error, is_error=True)
+            self.create_sync_log(date=date,result=error, is_error=True)
             raise error
 
         if res:
             total_entries, data = res
         else:
-            self.create_ad_log(date=date,result='Ошибка. Данные не получены', is_error=True)
+            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
             raise Exception('Ошибка. Данные не получены')
         
         if total_entries == 0:
             result = "Новых данных нет"
-            self.create_ad_log(result=result)
+            self.create_sync_log(result=result)
             return result
         
         n = 0
@@ -695,7 +695,7 @@ class ZupSyncPassport(models.AbstractModel):
         if not message_update == '':
             result += "\n Обновлены Документы УЛ и адреса сотрудников: \n" + message_update
 
-        self.create_ad_log(result=result)
+        self.create_sync_log(result=result)
 
         return result
 
@@ -731,7 +731,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                 result += self.zup_sync_personal_doc(doc_obj=doc_obj, date_start=date_start, date_end=date_end)
             except Exception as error:
                 _logger.warning("Ошибка zup_sync_personal_doc_full %s" % str(error))
-                self.create_ad_log(date=date,result=str(error), is_error=True)
+                self.create_sync_log(date=date,result=str(error), is_error=True)
                 raise error
 
         return result
@@ -805,18 +805,18 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                                     param=param
                                 )
         except Exception as error:
-            self.create_ad_log(date=date,result=error, is_error=True)
+            self.create_sync_log(date=date,result=error, is_error=True)
             raise error
 
         if res:
             total_entries, data = res
         else:
-            self.create_ad_log(date=date,result='Ошибка. Данные не получены', is_error=True)
+            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
             raise Exception('Ошибка. Данные не получены')
         
         if total_entries == 0:
             result = "Новых данных нет"
-            self.create_ad_log(result=result)
+            self.create_sync_log(result=result)
             return result
 
         if doc_obj == 'hr.transfer_doc_multi': # Перевод на другую ф-ю
@@ -827,6 +827,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         message_error = ''
         message_update = ''
         message_create = ''
+        message_create_employee = ''
         
         for line in data:
             # print(line)
@@ -840,8 +841,16 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                     ('guid_1c', '=', employee_guid_1c)
                     ],limit=1)
                 if len(empl_search) == 0:
-                    message_error += "не найден сотрудник с gud1c %s, пропуск \n" % ( guid_1c)
-                    continue # Переход к следующей записи
+                    # Запрос в ЗУП для получения сотрудника по employee_guid_1c
+                    message_create_employee += self.env['zup.sync_employer'].zup_sync_employer(by_guid_1c=employee_guid_1c)
+
+                    # Повторный поиск сотрудника
+                    empl_search = self.env['hr.employee'].search([
+                    ('guid_1c', '=', employee_guid_1c)
+                    ],limit=1)
+                    if len(empl_search) == 0:
+                        message_error += "не найден сотрудник с gud1c %s, пропуск \n" % ( employee_guid_1c)
+                        continue # Переход к следующей записи
                 
 
                 
@@ -917,12 +926,13 @@ class ZupSyncPersonalDoc(models.AbstractModel):
 
 
         result ='Всего получено из ЗУП %s записей \n' % total_entries
-        if not message_error == '':
-            result = "\n Обновление прошло с предупреждениями: \n \n" + message_error
+        if len(message_error)>0:
+            result += "\n Обновление прошло с предупреждениями: \n \n" + message_error
+            _logger.warning(result)
         else:
-            result = "\n Обновление прошло успешно \n \n"
+            result += "\n Обновление прошло успешно \n \n"
 
-        _logger.info(result)
+
 
         if not message_update == '':
             result += "\n Обновлены Документы %s: \n" % doc_name 
@@ -931,7 +941,9 @@ class ZupSyncPersonalDoc(models.AbstractModel):
             result += "\n Созданы Документы %s: \n" % doc_name 
             result +=  message_create
 
-        self.create_ad_log(result=result)
+        _logger.debug(result)
+
+        self.create_sync_log(result=result)
 
         return result
 
@@ -1037,7 +1049,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
             result += "\n Созданы Документы %s: \n" % doc_name 
             result +=  message_create
 
-        self.create_ad_log(result=result)
+        self.create_sync_log(result=result)
 
         return result
 
@@ -1250,18 +1262,18 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                                     url_api=URL_API,
                                 )
         except Exception as error:
-            self.create_ad_log(date=date,result=error, is_error=True)
+            self.create_sync_log(date=date,result=error, is_error=True)
             raise error
 
         if res:
             total_entries, data = res
         else:
-            self.create_ad_log(date=date,result='Ошибка. Данные не получены', is_error=True)
+            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
             raise Exception('Ошибка. Данные не получены')
         
         if total_entries == 0:
             result = "Новых данных нет"
-            self.create_ad_log(result=result)
+            self.create_sync_log(result=result)
             return result
         
         n = 0
@@ -1334,7 +1346,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
             result += "\n Созданы Документы %s: \n" 
             result +=  message_create
 
-        self.create_ad_log(result=result)
+        self.create_sync_log(result=result)
 
         # print(guid_change_doc_list)
 
@@ -1349,7 +1361,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                                     url_api=URL_API_REMOVE
                                 )
         except Exception as error:
-            self.create_ad_log(date=date,result=error, is_error=True)
+            self.create_sync_log(date=date,result=error, is_error=True)
             raise error
 
         if not res:

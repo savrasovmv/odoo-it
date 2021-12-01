@@ -5,7 +5,7 @@
         <field name="name">sync.log.form</field>
         <field name="model">sync.log</field>
         <field name="arch" type="xml">
-            <form string="Журна синхронизации" create="false" edit="false">
+            <form string="Журна синхронизации" create="false" edit="true">
                 <sheet>
                   <group>
                     <field name="date" string="Дата"/>  
@@ -22,7 +22,7 @@
         <field name="name">sync.log.tree</field>
         <field name="model">sync.log</field>
         <field name="arch" type="xml">
-            <tree create="false" edit="false">
+            <tree create="false" edit="true">
                 <field name="date" string="Дата"/>
                 <field name="name"/>
                 <field name="obj"/>

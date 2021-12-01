@@ -229,11 +229,12 @@ class AdConnect(models.AbstractModel):
 
     def ldap_create_user(self, employee_id):
         """Создает пользователя AD из сотрудника HR"""
+
         if not employee_id:
             _logger.warning('Нет параметров для создния пользователя AD')
             raise Exception("Нет параметров для создния пользователя AD")
 
-        _logger.debug("Создает пользователя AD из сотрудника HR" + str(employee_id.name))
+        _logger.debug("Создает пользователя AD из сотрудника HR " + str(employee_id.name))
         try:
             LDAP_SEARCH_BASE = self.env['ir.config_parameter'].sudo().get_param('ldap_search_base')
             LDAP_HOME_DIRECTORY = self.env['ir.config_parameter'].sudo().get_param('ldap_home_dirertory')
@@ -358,7 +359,7 @@ class AdConnect(models.AbstractModel):
             raise Exception("Нет object_SID для обновления пользователя AD")
         pass
 
-    def create_ad_log(self, date=False, is_error=False, result=''):
+    def create_sync_log(self, date=False, is_error=False, result=''):
         """Создает запись в журнале синхронизации с AD"""
         if not date:
             date = datetime.today()
@@ -409,7 +410,7 @@ class AdSyncGroup(models.AbstractModel):
         
         if total_entries == 0:
             result = "Новых данных нет"
-            self.create_ad_log(result=result)
+            self.create_sync_log(result=result)
             return result
 
         n = 0
@@ -460,7 +461,7 @@ class AdSyncGroup(models.AbstractModel):
             result += "\n Обновлены группы: \n" + message_update
 
         #self.env['sync.log'].sudo().create({'name': 'Группы AD', 'is_error': False, 'result': result})
-        self.create_ad_log(date=date, result=result)
+        self.create_sync_log(date=date, result=result)
 
         return result
 
@@ -525,7 +526,7 @@ class AdSyncUsers(models.AbstractModel):
         
         if total_entries == 0:
             result = "Новых данных нет"
-            self.create_ad_log(result=result)
+            self.create_sync_log(result=result)
             return result
 
 
@@ -667,7 +668,7 @@ class AdSyncUsers(models.AbstractModel):
             result += "\n Обновлены пользователи AD: \n" + message_user_update
         #print("result sync: ", result)
 
-        self.create_ad_log(result=result)
+        self.create_sync_log(result=result)
 
         return result
        

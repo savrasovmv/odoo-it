@@ -14,10 +14,20 @@ class SyncTasks(models.Model):
     date = fields.Datetime(string='Дата')
     obj_create = fields.Char(u'Модель')
     obj_create_name = fields.Char(u'Имя модели')
-    obj_create_id = fields.Integer(u'Id записи')
+    obj_create_id = fields.Integer(u'Id объекта')
     is_completed = fields.Boolean(string='Выполнена?', default=False)
     is_canceled = fields.Boolean(string='Отменить?', default=False)
     is_updated = fields.Boolean(string='Обновить?', default=False)
+
+    result = fields.Text(string='Результат', default='')
+    obj_url = fields.Char(string='Ссылка на объект', compute='_get_url')
+
+    def _get_url(self):
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        for rec in self:
+            rec.obj_url = '%s/web#id=%s&model=%s&view_type=form' % (base_url, rec.obj_create_id, rec.obj_create)
+
+    
 
     def get_task(self, obj):
         return self.search([
@@ -123,7 +133,6 @@ class SyncTasks(models.Model):
             if self.obj_create == 'hr.recruitment_doc':
                 # create user AD
                 doc = self.env[self.obj_create].sudo().browse(self.obj_create_id)
-                print('=++++=', doc)
                 if doc:
                     self.env['ad.connect'].sudo().ldap_create_user(doc.employee_id)
 

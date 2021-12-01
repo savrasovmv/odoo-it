@@ -31,7 +31,7 @@ class HrRecruitmentDoc(models.Model):
     def create(self, vals):
         doc = super(HrRecruitmentDoc, self).create(vals)
         if vals.get('posted'):
-            self.env['sync.tasks'].sudo().create_task(self)
+            self.env['sync.tasks'].sudo().create_task(doc)
         return doc
     
     def write(self, vals):
@@ -71,7 +71,7 @@ class HrTerminationDoc(models.Model):
     def create(self, vals):
         doc = super(HrTerminationDoc, self).create(vals)
         if vals.get('posted'):
-            self.env['sync.tasks'].sudo().create_task(self)
+            self.env['sync.tasks'].sudo().create_task(doc)
         return doc
     
     def write(self, vals):
@@ -215,4 +215,16 @@ class HrTransferDoc(models.Model):
                 if len(recruitment)>0:
                     line.old_job_title = recruitment.job_title
                     line.old_department_id = recruitment.department_id.id
+
+    @api.model
+    def create(self, vals):
+        doc = super(HrTransferDoc, self).create(vals)
+        if vals.get('posted'):
+            self.env['sync.tasks'].sudo().create_task(doc)
+        return doc
+    
+    def write(self, vals):
+        doc = super(HrTransferDoc, self).write(vals)
+        self.env['sync.tasks'].sudo().update_task(self)
+        return doc
 

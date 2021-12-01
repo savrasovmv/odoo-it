@@ -12,14 +12,22 @@
                 </header>
                 <sheet>
                   <group>
-                    <field name="date"/>  
-                    <field name="name"/>  
-                    <field name="obj_create"/>  
-                    <field name="obj_create_name"/>
-                    <field name="obj_create_id"/>
-                    <field name="is_completed"/>
-                    <field name="is_canceled"/>
-                    <field name="is_updated"/>
+                    <group>
+                        <field name="date"/>  
+                        <field name="name"/>  
+                        <field name="obj_create"/>  
+                        <field name="obj_create_name"/>
+                        <field name="obj_create_id"/>
+                        <field name="obj_url" widget="url" text="Открыть объект"/>
+                    </group>
+                    <group>
+                        <field name="is_completed"/>
+                        <field name="is_canceled"/>
+                        <field name="is_updated"/>
+                    </group>
+                  </group>
+                  <group>
+                    <field name="result"/>  
                   </group>
                 </sheet>
             </form>
