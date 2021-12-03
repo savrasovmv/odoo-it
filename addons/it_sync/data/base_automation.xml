@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<odoo>
+
+    <!-- Автоматические действия Прием на работу -->
+
+    <record id="create_task_by_recruitment_doc" model="base.automation">
+        <field name="name">Создать задачу синхронизации из Прием на работу</field>
+        <field name="model_id" ref="it_hr.model_hr_recruitment_doc"/>
+        <field name="trigger">on_create</field>
+        <field name="state">code</field>
+        <field name="code">
+# Выполнить создание задачи 
+env['sync.tasks'].sudo().create_task(record)
+        </field>
+    </record>
+    
+    <record id="update_task_by_recruitment_doc" model="base.automation">
+        <field name="name">Обновить задачу синхронизации из Прием на работу</field>
+        <field name="model_id" ref="it_hr.model_hr_recruitment_doc"/>
+        <field name="trigger">on_write</field>
+        <field name="state">code</field>
+        <field name="code">
+# Выполнить обновление задачи 
+env['sync.tasks'].sudo().update_task(record)
+        </field>
+    </record>
+
+
+
+    <!-- Автоматические действия Увольнения -->
+
+    <record id="create_task_by_termination_doc" model="base.automation">
+        <field name="name">Создать задачу синхронизации из Увольнения</field>
+        <field name="model_id" ref="it_hr.model_hr_termination_doc"/>
+        <field name="trigger">on_create</field>
+        <field name="state">code</field>
+        <field name="code">
+# Выполнить создание задачи 
+env['sync.tasks'].sudo().create_task(record)
+        </field>
+    </record>
+
+    <record id="update_task_by_termination_doc" model="base.automation">
+        <field name="name">Обновить задачу синхронизации из Увольнения</field>
+        <field name="model_id" ref="it_hr.model_hr_termination_doc"/>
+        <field name="trigger">on_write</field>
+        <field name="state">code</field>
+        <field name="code">
+# Выполнить обновление задачи 
+env['sync.tasks'].sudo().update_task(record)
+        </field>
+    </record>
+
+
+
+
+    <!-- Автоматические действия Переводы сотрудников -->
+
+    <record id="create_task_by_transfer_doc" model="base.automation">
+        <field name="name">Создать задачу синхронизации из Переводы сотрудников</field>
+        <field name="model_id" ref="it_hr.model_hr_transfer_doc"/>
+        <field name="trigger">on_create</field>
+        <field name="state">code</field>
+        <field name="code">
+# Выполнить создание задачи 
+env['sync.tasks'].sudo().create_task(record)
+        </field>
+    </record>
+
+
+    <record id="update_task_by_transfer_doc" model="base.automation">
+        <field name="name">Обновить задачу синхронизации из Переводы сотрудников</field>
+        <field name="model_id" ref="it_hr.model_hr_transfer_doc"/>
+        <field name="trigger">on_write</field>
+        <field name="state">code</field>
+        <field name="code">
+# Выполнить обновление задачи 
+env['sync.tasks'].sudo().update_task(record)
+        </field>
+    </record>
+
+
+
+</odoo>
+

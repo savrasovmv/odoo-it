@@ -47,6 +47,8 @@
                 <field name="is_completed"/>  
                 <field name="is_canceled"/>
                 <field name="is_updated"/>
+                <field name="create_date" string="Создана"/>
+                <field name="write_date" string="Обновлена"/>
 
             </tree>
         </field>
@@ -63,6 +65,10 @@
           </p>
         </field>
     </record>
+
+
+
+    
 
    
 </odoo>

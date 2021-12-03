@@ -35,6 +35,8 @@
 
         'security/ir.model.access.csv',
 
+        'data/base_automation.xml'
+
     ],
 
     'installable': True,
