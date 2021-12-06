@@ -6,6 +6,7 @@
         <menuitem id="ad_users_first_level_menu" name="Пользователи" sequence="10">
             <menuitem id="ad_users_menu_action" action="ad_users_action"/>
             <!-- <menuitem id="ad_organizacion_menu_action" action="ad_organizacion_action"/> -->
+            <menuitem id="ad_organizacion_menu_action" action="ad_organizacion_action"/>
             <menuitem id="ad_ou_menu_action" action="ad_ou_action"/>
             <menuitem id="ad_department_menu_action" action="ad_department_action"/>
             <!-- <menuitem id="ad_sync_users_wizard_menu_action" action="ad_sync_users_wizard_action"/> -->

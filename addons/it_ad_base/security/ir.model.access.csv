@@ -1,4 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ad_organizacion_manager,ad.organizacion,model_ad_organizacion,group_ad_manager,1,1,1,1
+access_ad_organizacion_users,ad.organizacion,model_ad_organizacion,group_ad_users,1,0,0,0
 access_ad_ou_manager,ad.ou,model_ad_ou,group_ad_manager,1,1,1,1
 access_ad_ou_users,ad.ou,model_ad_ou,group_ad_users,1,0,0,0
 access_ad_department_manager,ad.department,model_ad_department,group_ad_manager,1,1,1,1

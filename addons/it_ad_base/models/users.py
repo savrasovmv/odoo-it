@@ -11,6 +11,18 @@ import os, fnmatch
 from openpyxl.styles import Alignment, Border, Side, PatternFill, Font
 
 
+
+class AdOrganization(models.Model):
+    _name = "ad.organizacion"
+    _description = "Организация AD"
+    _order = "name"
+
+    name = fields.Char(u'Наименование', required=True)
+    active = fields.Boolean('Active', default=True)
+    hr_department_id = fields.Many2one("hr.department", string="HR Подразделене")
+    domain_name = fields.Char(string='Домен', help="Для userPrincipalName: username + @ + domain_name")
+    web_page = fields.Char(string='Веб-страница')
+
 class AdOU(models.Model):
     _name = "ad.ou"
     _description = "Организационное подразделение AD"
@@ -20,6 +32,7 @@ class AdOU(models.Model):
     active = fields.Boolean('Active', default=True)
     is_default = fields.Boolean(string='AD контейнер по умолчанию', help='Если установлено, новые пользователи не вошедшие не в одну группу будут создаваться тут')
     hr_department_id = fields.Many2one("hr.department", string="HR Подразделене")
+    organizacion_id = fields.Many2one("ad.organizacion", string="Организация")
 
 
 

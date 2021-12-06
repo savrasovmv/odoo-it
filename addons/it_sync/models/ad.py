@@ -140,7 +140,7 @@ class AdConnect(models.AbstractModel):
 
                     return line
 
-        ad_ou = self.env['ad.ou'].search([('is_default_ou', '=', True)], limit=1)
+        ad_ou = self.env['ad.ou'].search([('is_default', '=', True)], limit=1)
         return ad_ou
     
 
@@ -264,18 +264,18 @@ class AdConnect(models.AbstractModel):
             department = ldap3.utils.conv.escape_filter_chars(department_name, 'utf-8')
 
             param = {
-                            'company': employee_id.company_id.name, 
+                            'company': ou_id.organizacion_id.name, 
                             'department': department, 
                             'displayName': full_name,
                             'givenName': name, 
                             'sAMAccountName': username, 
-                            'userPrincipalName': username + '@' + employee_id.company_id.domain_name, 
+                            'userPrincipalName': username + '@' + ou_id.organizacion_id.domain_name, 
                             'sn': surname,
                             'title': title, 
                             'homeDrive': LDAP_HOME_DRIVER, 
                             'homeDirectory': LDAP_HOME_DIRECTORY,
                             'physicalDeliveryOfficeName' : ou_id.name, 
-                            'wWWHomePage' : employee_id.company_id.website
+                            'wWWHomePage' : ou_id.organizacion_id.web_page
                     }
             _logger.debug("Попытка создать пользователя AD %s, %s, %s" % (str(full_name), ou_id.name, param))
 

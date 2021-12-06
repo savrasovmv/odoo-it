@@ -1,4 +1,5 @@
 spisok = []
+spisok.append(['ad.organizacion',''])
 spisok.append(['ad.ou',''])
 spisok.append(['ad.department',''])
 spisok.append(['ad.group',''])

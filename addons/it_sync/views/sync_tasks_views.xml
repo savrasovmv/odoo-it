@@ -27,6 +27,9 @@
                     </group>
                   </group>
                   <group>
+                    <field name="obj_data"/>  
+                  </group>
+                  <group>
                     <field name="result"/>  
                   </group>
                 </sheet>

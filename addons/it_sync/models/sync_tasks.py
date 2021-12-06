@@ -15,6 +15,7 @@ class SyncTasks(models.Model):
     obj_create = fields.Char(u'Модель')
     obj_create_name = fields.Char(u'Имя модели')
     obj_create_id = fields.Integer(u'Id объекта')
+    obj_data = fields.Text(string='Данные объекта')
     is_completed = fields.Boolean(string='Выполнена?', default=False)
     is_canceled = fields.Boolean(string='Отменить?', default=False)
     is_updated = fields.Boolean(string='Обновить?', default=False)
@@ -42,6 +43,7 @@ class SyncTasks(models.Model):
             'obj_create': obj._name,
             'obj_create_name': obj._description,
             'obj_create_id': obj.id,
+            'obj_data': obj.read(),
         }
 
         doc_vals = {}
@@ -78,14 +80,17 @@ class SyncTasks(models.Model):
 
 
     def update_task(self, obj):
+        current_task = self.get_task(obj)
+
         standart_vals = {
             'obj_create': obj._name,
             'obj_create_name': obj._description,
             'obj_create_id': obj.id,
+            'obj_data': current_task.obj_data + '\n' + obj.read(),
+
         }
         doc_vals = {}
 
-        current_task = self.get_task(obj)
 
         if obj._name == 'hr.recruitment_doc':
             doc_vals = {
