@@ -19,6 +19,7 @@
             ]},
     'depends': [
         'base',
+        'base_automation',
         'mail',
         'it_hr',
         'it_ad_base'
