@@ -290,7 +290,8 @@ class ZupSyncEmployer(models.AbstractModel):
                 total_entries, data = res
         else:
             self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
-            raise Exception('Ошибка. Данные не получены')
+            result = "Данные по сотруднику не получены"
+            return result
         
         if total_entries == 0:
             result = "Новых данных нет"
@@ -316,7 +317,7 @@ class ZupSyncEmployer(models.AbstractModel):
         for line in data:
             if 'name' in line and 'guid1C' in line and 'departament' in line and 'position' in line:
 
-
+                _logger.debug("Данные по сотруднику: %s" % line)
                 name = line['name'] 
                 guid_1c = line['guid1C']
                 
@@ -913,7 +914,6 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                         ('guid_1c', '=', guid_1c)
                     ],limit=1)
                 if len(doc_search)>0:
-                    # print(vals)
                     doc_search.write(vals)
                     message_update += line['number'] + ' от ' + line['documentDate'] + '\n'
 

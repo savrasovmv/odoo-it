@@ -3,6 +3,9 @@
 from odoo import fields, models, api
 from datetime import datetime
 
+import logging
+_logger = logging.getLogger(__name__)
+
 
 
 class SyncTasks(models.Model):
@@ -39,11 +42,12 @@ class SyncTasks(models.Model):
 
     def create_task(self, obj):
 
+        _logger.debug("Создание задачи синхронизации для объекта " + obj._name)
         standart_vals = {
             'obj_create': obj._name,
             'obj_create_name': obj._description,
             'obj_create_id': obj.id,
-            'obj_data': obj.read(),
+            # 'obj_data': obj.read(),
         }
 
         doc_vals = {}
@@ -69,6 +73,7 @@ class SyncTasks(models.Model):
             }
         
         vals = {**standart_vals, **doc_vals}
+
         if current_task:
             current_task.write(vals)
             if current_task.is_completed:
@@ -80,15 +85,18 @@ class SyncTasks(models.Model):
 
 
     def update_task(self, obj):
+        _logger.debug("Обновление задачи синхронизации для объекта ")
+
         current_task = self.get_task(obj)
 
         standart_vals = {
             'obj_create': obj._name,
             'obj_create_name': obj._description,
             'obj_create_id': obj.id,
-            'obj_data': current_task.obj_data + '\n' + obj.read(),
+            # 'obj_data': str(current_task.obj_data) + '\n' + obj.read(),
 
         }
+
         doc_vals = {}
 
 
@@ -110,8 +118,8 @@ class SyncTasks(models.Model):
                 'date': obj.start_date,
             }
         
-
         vals = {**standart_vals, **doc_vals}
+        
         if obj.posted and not current_task:
             self.create(vals)
         elif obj.posted and current_task:
