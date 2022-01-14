@@ -45,13 +45,13 @@ class SyncWizard(models.TransientModel):
 
 
     def jms_wizard_action(self):
-        self.result = self.env['jms.connect'].sudo().jms_connect()
-        # try:
-        #     self.result = self.env['jms.connect'].sudo().jms_connect()
-        # except Exception as error:
-        #     return self.return_result(error=error)
+        # self.result = self.env['jms.connect'].sudo().jms_connect()
+        try:
+            self.result = self.env['jms.connect'].sudo().jms_connect()
+        except Exception as error:
+            return self.return_result(error=error)
         
-        # return self.return_result()
+        return self.return_result()
 
     
 
