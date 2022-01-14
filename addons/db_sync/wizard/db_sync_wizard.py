@@ -206,11 +206,16 @@ class DbSyncWizard(models.TransientModel):
             list_field_by_search = sync_model_id.get_search_field()
             domain = []
             for field in list_field_by_search:
-                if field.ttype == 'Many2one':
+                field_value = False
+                if field.ttype == 'many2one':
                     field_value = self.get_remote_id_by_local_id(obj_id[field])
                 else:
                     field_value = obj_id[field.name]
-                domain.append((field.name, '=', field_value))
+                
+                if field_value:
+                    domain.append((field.name, '=', field_value))
+                else:
+                    _logger.debug("Для поля %s не найдено значение, поле не добавлено в домен поиска" % (field.name))
             if len(domain)==0:
                 _logger.debug("Нет полей поиска соответствий для модели %s" % (sync_model_id))
                 self.text_error  = "Нет полей поиска соответствий для модели %s \n" % (sync_model_id)
