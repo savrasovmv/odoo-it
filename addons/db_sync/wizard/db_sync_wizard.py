@@ -208,7 +208,7 @@ class DbSyncWizard(models.TransientModel):
             for field in list_field_by_search:
                 field_value = False
                 if field.ttype == 'many2one':
-                    field_value = self.get_remote_id_by_local_id(obj_id[field])
+                    field_value = self.transform_many2one(obj_id, field)
                 else:
                     field_value = obj_id[field.name]
                 
