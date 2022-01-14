@@ -215,7 +215,10 @@ class DbSyncWizard(models.TransientModel):
                 if field_value:
                     domain.append((field.name, '=', field_value))
                 else:
-                    _logger.debug("Для поля %s не найдено значение, поле не добавлено в домен поиска" % (field.name))
+                    _logger.debug("Для поля %s не найдено значение, поле не добавлено в домен поиска в модели" % (field.name, sync_model_id))
+                    self.text_error  = "Для поля %s не найдено значение в УБ, запись модели %s пропущена \n" % (field.name, sync_model_id)
+                    self.count_error += 1
+                    return 
             if len(domain)==0:
                 _logger.debug("Нет полей поиска соответствий для модели %s" % (sync_model_id))
                 self.text_error  = "Нет полей поиска соответствий для модели %s \n" % (sync_model_id)
