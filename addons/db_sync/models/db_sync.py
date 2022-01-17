@@ -3,6 +3,9 @@ from odoo import tools
 from odoo.tools import html2plaintext
 import base64
 
+import logging
+_logger = logging.getLogger(__name__)
+
 
 class DbSyncServer(models.Model):
     """Модель настройка для подключения к внешнему серверу Odoo"""
@@ -170,9 +173,11 @@ class DbSyncModel(models.Model):
                 ('active', '=', False),
             ]
         if self.sync_date:
+            _logger.debug("Дата последней синхронизации %s" % (self.sync_date))
             w_date = domain + [("write_date", ">=", self.sync_date)]
             c_date = domain + [("create_date", ">=", self.sync_date)]
         else:
+            _logger.debug("Первая синхронизация")
             w_date = c_date = domain
         
         obj_rec = model_obj.search(w_date)
