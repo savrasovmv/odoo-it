@@ -187,10 +187,10 @@ class HrEmployee(models.Model):
         ('trip', 'Командировка'),
         ('sick_leave', 'Больничный'),
         ('fired', 'Уволен'),
-    ], string='Статус', readonly=True, default='work')
+    ], string='Статус', default='work', compute="_compute_status")
 
-    service_status_start_date = fields.Date(string='Начало', readonly=True)
-    service_status_end_date = fields.Date(string='Окончание', readonly=True)
+    service_status_start_date = fields.Date(string='Начало', compute="_compute_status")
+    service_status_end_date = fields.Date(string='Окончание', compute="_compute_status")
 
     # @api.depends("user_account_control")
     # def _get_user_account_control_result(self):
@@ -254,9 +254,12 @@ class HrEmployee(models.Model):
     def _get_date_start_work(self):
         return self.service_start_date or super()._get_date_start_work()
 
-    def get_status(self):
-        date = datetime.today().date()
+        
 
+    def _compute_status(self):
+        """Установка статуса сотрудника, на основании документов Отпуск, Командировка, Больничный"""
+
+        date = datetime.today().date()
         for line in self:
             # Сброс по умолчанию
             line.service_status = 'work'
@@ -300,6 +303,55 @@ class HrEmployee(models.Model):
                 line.service_status = 'sick_leave'
                 line.service_status_start_date = sick_leave.start_date
                 line.service_status_end_date = sick_leave.end_date
+
+            
+
+    def get_status(self):
+        date = datetime.today().date()
+
+        for line in self:
+            # # Сброс по умолчанию
+            # line.service_status = 'work'
+            # line.service_status_start_date = False
+            # line.service_status_end_date = False
+
+            # vacation = self.env['hr.vacation_doc'].search([
+            #     ('start_date', '<=', date),
+            #     ('end_date', '>=', date),
+            #     ('posted', '=', True),
+            #     ('employee_id', '=', line.id),
+            # ], limit=1, order='date desc')
+
+            # if len(vacation)>0:
+            #     line.service_status = 'vacation'
+            #     line.service_status_start_date = vacation.start_date
+            #     line.service_status_end_date = vacation.end_date
+
+
+            # trip = self.env['hr.trip_doc'].search([
+            #     ('start_date', '<=', date),
+            #     ('end_date', '>=', date),
+            #     ('posted', '=', True),
+            #     ('employee_id', '=', line.id),
+            # ], limit=1, order='date desc')
+
+            # if len(trip)>0:
+            #     line.service_status = 'trip'
+            #     line.service_status_start_date = trip.start_date
+            #     line.service_status_end_date = trip.end_date
+
+
+            # sick_leave = self.env['hr.sick_leave_doc'].search([
+            #     ('start_date', '<=', date),
+            #     ('end_date', '>=', date),
+            #     ('posted', '=', True),
+            #     ('employee_id', '=', line.id),
+            # ], limit=1, order='date desc')
+
+            # if len(sick_leave)>0:
+            #     line.service_status = 'sick_leave'
+            #     line.service_status_start_date = sick_leave.start_date
+            #     line.service_status_end_date = sick_leave.end_date
 
             fired = self.env['hr.termination_doc'].search([
                 ('service_termination_date', '<=', date),
