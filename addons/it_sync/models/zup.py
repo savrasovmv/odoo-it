@@ -19,7 +19,7 @@ def get_date(date_text):
 
     if date_text != '0001-01-01T00:00:00' and date_text !='':
         date = datetime.strptime(date_text, '%Y-%m-%dT%H:%M:%S').date()
-
+    _logger.debug("Преобразована дата из ЗУП: %s, в дату: %s " % (date_text, date))
     return date
 
 
@@ -832,16 +832,22 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         
         for line in data:
             # print(line)
+            _logger.debug("Обработка данных из ЗУП value: %s" % line)
+
             if 'guid1C' in line:
                 # print(line)
                 
                 guid_1c = line['guid1C'] # Идентификатор документа
+                _logger.debug("Идентификатор документа: %s" % guid_1c)
+
 
                 employee_guid_1c = line['employeeGuid1C']
                 empl_search = self.env['hr.employee'].search([
                     ('guid_1c', '=', employee_guid_1c)
                     ],limit=1)
                 if len(empl_search) == 0:
+                    _logger.debug("Запрос в ЗУП для получения сотрудника по employee_guid_1c: %s" % employee_guid_1c)
+
                     # Запрос в ЗУП для получения сотрудника по employee_guid_1c
                     message_create_employee += self.env['zup.sync_employer'].zup_sync_employer(by_guid_1c=employee_guid_1c)
 
@@ -850,6 +856,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                     ('guid_1c', '=', employee_guid_1c)
                     ],limit=1)
                     if len(empl_search) == 0:
+                        _logger.debug("не найден сотрудник с employee_guid_1c %s, пропуск" % employee_guid_1c)
                         message_error += "не найден сотрудник с gud1c %s, пропуск \n" % ( employee_guid_1c)
                         continue # Переход к следующей записи
                 
@@ -910,19 +917,27 @@ class ZupSyncPersonalDoc(models.AbstractModel):
 
                 vals = {**const_vals, **doc_vals}
 
+                _logger.debug("Данные объекта %s, со значениями: %s " % (doc_obj, vals))
+
+
+
                 doc_search = self.env[doc_obj].search([
                         ('guid_1c', '=', guid_1c)
                     ],limit=1)
                 if len(doc_search)>0:
+                    _logger.debug("Обновление объекта %s" % doc_search)
                     doc_search.write(vals)
                     message_update += line['number'] + ' от ' + line['documentDate'] + '\n'
 
                 elif vals['posted'] == True: #создаем только проведенные документ
+                    _logger.debug("Создание объекта %s " % doc_obj)
                     self.env[doc_obj].create(vals)
                     message_create += line['number'] + ' от ' + line['documentDate'] + '\n'
                 
             else:
                 message_error += "Отсутствует обязательное поле в запси: %s \n" % line
+                _logger.debug("Отсутствует обязательное поле в запси: %s" % line)
+
 
 
         result ='Всего получено из ЗУП %s записей \n' % total_entries
