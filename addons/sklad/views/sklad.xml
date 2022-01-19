@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="sklad_transfer_use_view_form" model="ir.ui.view">
+        <field name="name">sklad.transfer_use.form</field>
+        <field name="model">sklad.transfer_use</field>
+        <field name="arch" type="xml">
+            <form string="Передача в пользование" create="false" edit="true">
+                <sheet>
+                    <div class="oe_title">
+                        <h3>
+                        Передача в пользование №
+                        <field name="name"/>
+                        <!-- от 
+                        <field name="date"/>-->
+                        </h3> 
+                    </div> 
+                    <group>
+                        <group>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                        </group>
+                        
+                    </group>
+                    <notebook>
+                            <page string="Активы">
+                                <field name="assets_line_ids">
+                                    <tree editable="botton">
+                                        <field name="assets_id" options='{"no_create": 1, "no_create_edit": 1}'/>
+                                        <field name="serial_number"/>
+
+                                    </tree>
+                                    
+                                </field>     
+
+                            </page>
+                            <page string="Номенклатура">
+                                <field name="product_line_ids">
+                                    <tree editable="botton">
+                                        <field name="product_id" options='{"no_create": 1, "no_create_edit": 1}'/>
+                                        <field name="qty"/>
+
+                                    </tree>
+                                    
+                                </field>     
+
+                            </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="sklad_transfer_use_view_tree" model="ir.ui.view">
+        <field name="name">sklad.transfer_use.tree</field>
+        <field name="model">sklad.transfer_use</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sklad_transfer_use_action" model="ir.actions.act_window">
+        <field name="name">Передача в пользование</field>
+        <field name="res_model">sklad.transfer_use</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+
+
+    <record id="sklad_sklad_action" model="ir.actions.act_window">
+        <field name="name">Склады</field>
+        <field name="res_model">sklad.sklad</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+    <record id="sklad_assets_action" model="ir.actions.act_window">
+        <field name="name">Активы</field>
+        <field name="res_model">sklad.assets</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+    <record id="sklad_product_action" model="ir.actions.act_window">
+        <field name="name">Номенклатура</field>
+        <field name="res_model">sklad.product</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+   
+</odoo>

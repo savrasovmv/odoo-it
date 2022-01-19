@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    	<record model="ir.module.category" id="module_category_sklad">
+            <field name="name">Склад</field>
+            <field name="description">Управление активами и материалами</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="group_sklad_read_only" model="res.groups">
+            <field name="name">Просмотр</field>
+            <field name="category_id" ref="module_category_sklad" />
+            <!-- <field name="category_id" ref="base.module_category_cds"></field> -->
+            <!-- <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/> -->
+        </record>
+        
+        <record id="group_sklad_user" model="res.groups">
+            <field name="name">Пользователь</field>
+            <field name="category_id" ref="module_category_sklad" />
+            <!-- <field name="category_id" ref="base.module_category_cds"></field> -->
+            <field name="implied_ids" eval="[(4, ref('group_sklad_read_only'))]"/>
+        </record>
+        <record id="group_sklad_manager" model="res.groups">
+            <field name="name">Менеджер</field>
+            <field name="category_id" ref="module_category_sklad" />
+            <!-- <field name="category_id" ref="base.module_category_cds"></field> -->
+            <field name="implied_ids" eval="[(4, ref('group_sklad_user'))]"/>
+        </record>
+    
+    </data>
+    
+</odoo>

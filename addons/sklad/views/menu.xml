@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <menuitem
+            id="sklad_menu_main"
+            name="Склад"
+            sequence="11"
+            groups="group_sklad_read_only"
+            />
+
+        <menuitem
+            id="sklad_catalog_menu"
+            name="Справочники"
+            parent="sklad_menu_main"
+            sequence="1"
+            groups="group_sklad_read_only"
+            />
+                <menuitem
+                    id="sklad_sklad_menu"
+                    name="Склады"
+                    parent="sklad_catalog_menu"
+                    action="sklad_sklad_action"
+                    sequence="1"
+                    groups="group_sklad_read_only"
+                    />
+                
+                <menuitem
+                    id="sklad_assets_menu"
+                    name="Активы"
+                    parent="sklad_catalog_menu"
+                    action="sklad_assets_action"
+                    sequence="2"
+                    groups="group_sklad_read_only"
+                    />
+                
+                <menuitem
+                    id="sklad_product_menu"
+                    name="Номенклатура"
+                    parent="sklad_catalog_menu"
+                    action="sklad_product_action"
+                    sequence="3"
+                    groups="group_sklad_read_only"
+                    />
+
+
+
+        <menuitem
+            id="sklad_document_menu"
+            name="Документы"
+            parent="sklad_menu_main"
+            sequence="2"
+            groups="group_sklad_read_only"
+            />
+                
+            <menuitem
+                id="sklad_transfer_use_menu"
+                name="Передача в пользование"
+                parent="sklad_document_menu"
+                action="sklad_transfer_use_action"
+                sequence="1"
+                groups="group_sklad_read_only"
+                />
+        
+</odoo>
