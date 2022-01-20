@@ -41,6 +41,11 @@
                     text-align: center !important;
                     vertical-align: middle;
                 }
+                
+                .text-right {
+                    text-align: right !important;
+                    vertical-align: middle;
+                }
 
                 h4 {
                     line-height: 10px; !important;
@@ -104,37 +109,76 @@
 
 
                     </p>
-
-                    <table class="table table-border-black">
-                        <thead>
-                            <tr>
-                                <th class="text-center" scope="col" style="width: 40px;">№<br/>п/п</th>
-                                <th class="text-center" scope="col">Наименование</th>
-                                <th class="text-center" scope="col">Серийный номер</th>
-                            </tr>
-                        </thead>
-                        <tbody >
-                            <t t-set="i" t-value="1"/>
-                            <t t-foreach="o.assets_line_ids" t-as="line">
-                                <tr >
-                                    <td class="text-center"> 
-                                        <span t-esc="i"/>
-                                    </td>
-                                    <td class="td-50"> 
-                                        <span t-esc="line.name"/>
-                                    </td>
-                                    <td class="text-center"> 
-                                        <span t-field="line.serial_number"/>
-                                    </td>
+                    <t t-if="len(o.assets_line_ids)>0">
+                        <table class="table table-border-black">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" scope="col" style="width: 40px;">№<br/>п/п</th>
+                                    <th class="text-center" scope="col">Наименование</th>
+                                    <th class="text-center" scope="col">Серийный номер</th>
                                 </tr>
+                            </thead>
+                            <tbody >
+                                <t t-set="i" t-value="1"/>
+                                <t t-foreach="o.assets_line_ids" t-as="line">
+                                    <tr >
+                                        <td class="text-center"> 
+                                            <span t-esc="i"/>
+                                        </td>
+                                        <td class="td-50"> 
+                                            <span t-esc="line.name"/>
+                                        </td>
+                                        <td class="text-center"> 
+                                            <span t-field="line.serial_number"/>
+                                        </td>
+                                    </tr>
 
-                                <t t-set="i" t-value="i+1"/>
-                            </t>
-                            
+                                    <t t-set="i" t-value="i+1"/>
+                                </t>
+                                
 
-                            
-                        </tbody>
-                    </table>
+                                
+                            </tbody>
+                        </table>
+                    </t>
+
+                    <t t-if="len(o.product_line_ids)>0">
+                        <br/>
+                        <table class="table table-border-black">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" scope="col" style="width: 40px;">№<br/>п/п</th>
+                                    <th class="text-center" scope="col">Наименование</th>
+                                    <th class="text-center" scope="col">Ед. изм.</th>
+                                    <th class="text-center" scope="col">Кол-во</th>
+                                </tr>
+                            </thead>
+                            <tbody >
+                                <t t-set="i" t-value="1"/>
+                                <t t-foreach="o.product_line_ids" t-as="line">
+                                    <tr >
+                                        <td class="text-center"> 
+                                            <span t-esc="i"/>
+                                        </td>
+                                        <td class="td-50"> 
+                                            <span t-esc="line.name"/>
+                                        </td>
+                                        <td class="text-center"> 
+                                            <span t-field="line.product_uom_id.name"/>
+                                        </td>
+                                        <td class="text-right"> 
+                                            <span t-field="line.qty"/>
+                                        </td>
+                                    </tr>
+
+                                    <t t-set="i" t-value="i+1"/>
+                                </t>
+                                
+
+                                
+                            </tbody>
+                        </table>
+                    </t>
                     <p style="text-indent: 0;">
 
                         1. Получатель оборудования несет ответственность за преднамеренное повреждение переданного ему оборудования.<br/>
