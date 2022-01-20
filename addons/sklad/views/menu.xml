@@ -16,14 +16,7 @@
             sequence="1"
             groups="group_sklad_read_only"
             />
-                <menuitem
-                    id="sklad_sklad_menu"
-                    name="Склады"
-                    parent="sklad_catalog_menu"
-                    action="sklad_sklad_action"
-                    sequence="1"
-                    groups="group_sklad_read_only"
-                    />
+                
                 
                 <menuitem
                     id="sklad_assets_menu"
@@ -34,12 +27,13 @@
                     groups="group_sklad_read_only"
                     />
                 
+                                
                 <menuitem
                     id="sklad_product_menu"
                     name="Номенклатура"
                     parent="sklad_catalog_menu"
                     action="sklad_product_action"
-                    sequence="3"
+                    sequence="5"
                     groups="group_sklad_read_only"
                     />
 
@@ -61,5 +55,70 @@
                 sequence="1"
                 groups="group_sklad_read_only"
                 />
+
+
+
+        <menuitem
+            id="sklad_report_menu"
+            name="Отчеты"
+            parent="sklad_menu_main"
+            sequence="5"
+            groups="group_sklad_read_only"
+            />
+
+            <menuitem
+                id="sklad_transfer_use_assets_line_menu"
+                name="Передача в пользование"
+                parent="sklad_report_menu"
+                action="sklad_transfer_use_assets_line_action"
+                sequence="1"
+                groups="group_sklad_read_only"
+                />
+
+
         
+        <menuitem
+            id="sklad_settings_menu"
+            name="Настройки"
+            parent="sklad_menu_main"
+            sequence="10"
+            groups="group_sklad_manager"
+            />
+
+            <menuitem
+                id="sklad_sklad_menu"
+                name="Склады"
+                parent="sklad_settings_menu"
+                action="sklad_sklad_action"
+                sequence="1"
+                groups="group_sklad_manager"
+                />
+
+            <menuitem
+                id="sklad_product_uom_menu"
+                name="Единицы измерения"
+                parent="sklad_settings_menu"
+                action="sklad_product_uom_action"
+                sequence="2"
+                groups="group_sklad_manager"
+                />
+            
+            <menuitem
+                id="sklad_product_category_menu"
+                name="Категории номенклатуры"
+                parent="sklad_settings_menu"
+                action="sklad_product_category_action"
+                sequence="3"
+                groups="group_sklad_manager"
+                />
+
+            <menuitem
+                id="sklad_location_menu"
+                name="Местонахождения"
+                parent="sklad_settings_menu"
+                action="sklad_location_action"
+                sequence="3"
+                groups="group_sklad_manager"
+                />
+    
 </odoo>

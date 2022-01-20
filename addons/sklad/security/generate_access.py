@@ -2,7 +2,10 @@
 
 spisok = []
 spisok.append(['sklad.sklad','', 1])
+spisok.append(['sklad.location','', 1])
 spisok.append(['sklad.assets','', 1])
+spisok.append(['sklad.product_uom','', 1])
+spisok.append(['sklad.product_category','', 1])
 spisok.append(['sklad.product','', 1])
 spisok.append(['sklad.transfer_use','', 1])
 spisok.append(['sklad.transfer_use_assets_line','', 1])

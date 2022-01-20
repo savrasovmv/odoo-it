@@ -5,4 +5,5 @@ from . import assets
 from . import product
 from . import sklad
 from . import transfer
+from . import location
 

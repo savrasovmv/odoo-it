@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+<odoo>
+
+    
+
+        <template id="report_style">
+            <style type="text/css">
+                .page {
+                    width: 100%;
+                    font-family: "Arial";
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 16px;
+                }
+
+                th {
+
+                        border-color:black !important;
+                        border: 1px solid black;
+                        padding: 3px !important;;
+                    }
+
+                td {
+                        border-color:black !important;
+                        border: 1px solid black;
+                        padding: 3px !important;;
+                       
+                    }
+                .not-border {
+                    border: none !important;
+                }
+
+
+                .td-50 {
+                    width: 50%;
+                }
+
+                .text-center {
+                    text-align: center !important;
+                    vertical-align: middle;
+                }
+
+                h4 {
+                    line-height: 10px; !important;
+                    margin-block: 8px;
+                }
+
+                .sig-main {
+                        width: 100%;
+                        flex-wrap: nowrap;
+                        display: flex;
+                        justify-content: flex-end;
+                }
+                .sig-content {
+                        position: relative; 
+                        height: 1cm;
+                        width: 100%;
+                        display: flex;
+                        justify-content: flex-end;
+                }
+                .sig-signature {
+                    
+                    position:absolute; 
+                    top:50%; 
+                    transform: translate(0, -50%);
+                    -webkit-transform: translate(0, -50%);
+                    -ms-transform: translate(0, -50%);
+                    
+                }
+                .sig-name {
+                        width: 100%;
+                        display: flex;
+                        justify-content: flex-end;
+                }
+
+                p {
+                    text-align: justify;
+                    text-indent: 30px;
+                    padding-top: 10px !important;
+                    padding-bottom: 10px !important;
+                }
+
+            </style>
+		</template>
+
+    <template id="transfer_use_print_report">
+        
+        <t t-call="web.html_container">  
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                <t t-call="sklad.report_style"/>
+                
+                    <div class="text-center">
+
+                        <div style="font-weight: bold;"> Акт приема-передачи оборудования во временное пользование </div>
+                        <div style="font-weight: bold;"> № <t t-esc="o.name"/> от <span t-field="o.date" t-options='{"format": "dd.MM.yyyy"}'/></div>
+                    </div>
+                    <div> г.Тюмень </div>
+
+                    <p>
+                        Настоящий акт приема-передачи удостоверяет, что <span t-esc="res_company.name"/>, в лице материально-ответственного лица <span t-esc="o.mol_id.job_title"/> <span t-esc="o.mol_id.name"/>, передало сотруднику ООО «ЭнергоТехСервис» <span t-esc="o.recipient_id.job_title"/> <span t-esc="o.recipient_id.name"/> (далее получатель оборудования) во временное использование следующее оборудование со всеми принадлежностями:
+
+
+                    </p>
+
+                    <table class="table table-border-black">
+                        <thead>
+                            <tr>
+                                <th class="text-center" scope="col" style="width: 40px;">№<br/>п/п</th>
+                                <th class="text-center" scope="col">Наименование</th>
+                                <th class="text-center" scope="col">Серийный номер</th>
+                            </tr>
+                        </thead>
+                        <tbody >
+                            <t t-set="i" t-value="1"/>
+                            <t t-foreach="o.assets_line_ids" t-as="line">
+                                <tr >
+                                    <td class="text-center"> 
+                                        <span t-esc="i"/>
+                                    </td>
+                                    <td class="td-50"> 
+                                        <span t-esc="line.name"/>
+                                    </td>
+                                    <td class="text-center"> 
+                                        <span t-field="line.serial_number"/>
+                                    </td>
+                                </tr>
+
+                                <t t-set="i" t-value="i+1"/>
+                            </t>
+                            
+
+                            
+                        </tbody>
+                    </table>
+                    <p style="text-indent: 0;">
+
+                        1. Получатель оборудования несет ответственность за преднамеренное повреждение переданного ему оборудования.<br/>
+                        2. Получатель оборудования обязуется вернуть его в том состоянии, в каком он его получил, с учетом нормального износа.<br/>
+                        3. Получатель оборудования не имеет каких-либо претензий в отношении вышеуказанного Оборудования, в том числе (но не ограничиваясь) по внешнему виду, качеству, комплектности и иным параметрам. Работоспособность Оборудования проверена.<br/>
+                        4. Акт приема-передачи составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой Стороны.<br/>
+
+
+                    </p>
+                    <table class="table not-border">
+                        <!-- <thead>
+                            <tr>
+                                <th class="not-border" scope="col">Материально-ответственное лицо</th>
+                                <th class="not-border" scope="col">Получатель оборудования</th>
+                            </tr>
+                        </thead> -->
+                        <tbody >
+                            <tr >
+                                <td class="td-50 not-border text-center"> 
+                                    Материально-ответственное лицо
+                                </td>
+                                <td class="td-50 not-border text-center"> 
+                                    Получатель оборудования
+                                </td>
+                            </tr>
+                            <tr >
+                                <td class="td-50 not-border text-center"> 
+                                    <span t-esc="o.mol_id.name"/>
+                                    <br/>
+                                    <br/>
+                                </td>
+                                <td class="td-50 not-border text-center"> 
+                                    <span t-esc="o.recipient_id.name"/>
+                                    <br/>
+                                    <br/>
+                                </td>
+                            </tr>
+                            <tr >
+                                <td class="td-50 not-border text-center"> 
+                                    _____________________________
+                                </td>
+                                <td class="td-50 not-border text-center"> 
+                                    _____________________________
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </t>
+
+        </t>
+           
+    </template>
+
+
+
+    <record id="action_print_transfer_use" model="ir.actions.report">
+        <field name="name">Акт приема-передачи</field>
+        <field name="model">sklad.transfer_use</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sklad.transfer_use_print_report</field>
+        <field name="report_file">sklad.transfer_use_print_report</field>
+        <field name="print_report_name">'Акт приема-передачи - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_sklad_transfer_use"/>
+        <field name="paperformat_id" ref="sklad.paperformat_lowmargin" />
+    </record>
+
+
+
+    
+
+    <!-- <record id="ets_cds.request_report" model="ir.actions.report.xml">
+        <field name="paperformat_id" ref="ets_cds.paperformat_lowmargin" />
+    </record> -->
+
+</odoo>

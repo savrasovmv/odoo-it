@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <odoo>
 
-    <record id="sklad_sklad_action" model="ir.actions.act_window">
-        <field name="name">Склады</field>
-        <field name="res_model">sklad.sklad</field>
+    <record id="sklad_product_uom_action" model="ir.actions.act_window">
+        <field name="name">Единицы измерения</field>
+        <field name="res_model">sklad.product_uom</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
           <p>
@@ -12,9 +12,9 @@
         </field>
     </record>
 
-    <record id="sklad_assets_action" model="ir.actions.act_window">
-        <field name="name">Активы</field>
-        <field name="res_model">sklad.assets</field>
+    <record id="sklad_product_category_action" model="ir.actions.act_window">
+        <field name="name">Категории номенклатуры</field>
+        <field name="res_model">sklad.product_category</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
           <p>
@@ -23,11 +23,11 @@
         </field>
     </record>
 
+   
 
-
-    <record id="sklad_location_action" model="ir.actions.act_window">
-        <field name="name">Местонахождения</field>
-        <field name="res_model">sklad.location</field>
+    <record id="sklad_product_action" model="ir.actions.act_window">
+        <field name="name">Номенклатура</field>
+        <field name="res_model">sklad.product</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
           <p>
@@ -35,8 +35,6 @@
           </p>
         </field>
     </record>
-
-    
 
    
 </odoo>

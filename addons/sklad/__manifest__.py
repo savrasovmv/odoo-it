@@ -10,10 +10,14 @@
     "summary": "Склад. управление активами и материалами",
     "depends": ["hr"],
     "data": [
+        "views/product.xml",
         "views/sklad.xml",
+        "views/transfer_use.xml",
         'security/sklad_security.xml',
         'security/ir.model.access.csv',
 
+        "report/paperformat.xml",
+        "report/transfer_use_print_report.xml",
         "data/sequence_data.xml",
         "views/menu.xml",
         ],
