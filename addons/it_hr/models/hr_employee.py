@@ -538,7 +538,6 @@ class HrEmployee(models.Model):
             'name': self.name,
             'login': login,
             'partner_id': new_partner.id,
-            'active': False,
         }
 
         user_search = self.env['res.users'].search([
@@ -548,7 +547,7 @@ class HrEmployee(models.Model):
             user_search.write(user_vals)
             new_user = user_search
         else:
-            new_user = self.env['res.users'].create(user_vals)
+            new_user = self.env['res.users'].with_context(no_reset_password=True).create(user_vals)
         
         if new_user:
             self.user_id = new_user.id
