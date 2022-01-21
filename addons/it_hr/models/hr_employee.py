@@ -498,7 +498,7 @@ class HrEmployee(models.Model):
             err = "Пользователь не зарегистрирован в АД "
             raise ValueError(str(err))
 
-        login = self.ad_users_id.username
+        login = self.ad_users_id.username.lower()
 
         if not login:
             err = "Не задан username для пользователя"
