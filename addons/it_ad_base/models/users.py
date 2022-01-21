@@ -208,7 +208,20 @@ class AdUsers(models.Model):
         pass
 
 
-    
+    def action_update_employee_by_user(self):
+        """Обновляет данные сотрудника из пользователя (тел, фото, email)"""
+        for user in self:
+            if user.employee_id:
+                employee = user.employee_id
+                if user.photo:
+                    employee.image_1920 = user.photo
+                else:
+                    employee._default_image()
+
+                employee.mobile_phone = user.phone
+                employee.mobile_phone2 = user.sec_phone
+                employee.ip_phone = user.ip_phone
+                employee.work_email = user.email
 
 
     

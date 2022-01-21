@@ -10,6 +10,7 @@ spisok.append(['ad.set_group_line',''])
 spisok.append(['jms.event_log',''])
 spisok.append(['jms.wizard',''])
 spisok.append(['jms.report',''])
+spisok.append(['ad.mailbox',''])
 
 
 

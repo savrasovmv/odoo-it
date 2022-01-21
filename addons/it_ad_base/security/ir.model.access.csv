@@ -21,3 +21,5 @@ access_jms_wizard_manager,jms.wizard,model_jms_wizard,group_ad_manager,1,1,1,1
 access_jms_wizard_users,jms.wizard,model_jms_wizard,group_ad_users,1,0,0,0
 access_jms_report_manager,jms.report,model_jms_report,group_ad_manager,1,1,1,1
 access_jms_report_users,jms.report,model_jms_report,group_ad_users,1,0,0,0
+access_ad_mailbox_manager,ad.mailbox,model_ad_mailbox,group_ad_manager,1,1,1,1
+access_ad_mailbox_users,ad.mailbox,model_ad_mailbox,group_ad_users,1,0,0,0

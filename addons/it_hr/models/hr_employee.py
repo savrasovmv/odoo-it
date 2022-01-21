@@ -44,9 +44,9 @@ class HrEmployee(models.Model):
     number_1c = fields.Char(string='Номер в 1С', readonly=True)
 
     # Возраст
-    age = fields.Integer(string="Возраст", compute="_compute_age")
-    birthday_month = fields.Integer(string="Месяц рождения", compute="_compute_age", store=True)
-    birthday_day = fields.Integer(string="День месяца рождения", compute="_compute_age", store=True)
+    age = fields.Integer(string="Возраст", compute="_compute_age", compute_sudo=True)
+    birthday_month = fields.Integer(string="Месяц рождения", compute="_compute_age", store=True, compute_sudo=True)
+    birthday_day = fields.Integer(string="День месяца рождения", compute="_compute_age", store=True, compute_sudo=True)
 
     is_fired = fields.Boolean(string='Уволен')
     
@@ -479,3 +479,77 @@ class HrEmployee(models.Model):
     # функция _sync_user находится в HR модуле hr_employee.py
     def _sync_user(self, user, employee_has_image=False):
         return {}
+
+
+
+    def action_create_user_by_employee(self):
+        """Создает пользователя из сотрудника, при условии наличия учетной записи в АД"""
+
+        self.ensure_one()
+        email = self.work_email
+        if not email:
+            err = "Нет электронного адреса"
+            raise ValueError(str(err))
+        if self.user_id:
+            err = "Пользователь уже зарегистрирован"
+            raise ValueError(str(err))
+        
+        if not self.ad_users_id:
+            err = "Пользователь не зарегистрирован в АД "
+            raise ValueError(str(err))
+
+        login = self.ad_users_id.username
+
+        if not login:
+            err = "Не задан username для пользователя"
+            raise ValueError(str(err))
+
+        mobile = self.mobile_phone if self.mobile_phone else ''
+        mobile += ' ' + self.mobile_phone2 if self.mobile_phone2 else ''
+
+        partner_vals = {
+            'name': self.name,
+            'parent_id': self.company_id.partner_id.id,
+            'company_id': self.company_id.id,
+            'company_type': 'person',
+            'email': email,
+            'function': self.job_title,
+            'phone': self.ip_phone,
+            'mobile': mobile,
+            'employee': True,
+            'image_1920': self.image_1920,
+        }
+
+        part_search = self.env['res.partner'].search([
+            ('name', '=', self.name),
+            ('email', '=', email)
+        ], limit=1)
+        
+
+        if len(part_search)>0:
+            part_search.write(partner_vals)
+            new_partner = part_search
+        else:
+            new_partner = self.env['res.partner'].create(partner_vals)
+
+
+        new_user = False
+        user_vals = {
+            'name': self.name,
+            'login': login,
+            'partner_id': new_partner.id,
+            'active': False,
+        }
+
+        user_search = self.env['res.users'].search([
+            ('login', '=', login)
+        ], limit=1)
+        if len(user_search)>0:
+            user_search.write(user_vals)
+            new_user = user_search
+        else:
+            new_user = self.env['res.users'].create(user_vals)
+        
+        if new_user:
+            self.user_id = new_user.id
+            

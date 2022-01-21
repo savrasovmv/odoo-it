@@ -18,10 +18,11 @@ class DbSyncServer(models.Model):
     server_port = fields.Integer("Порт", required=True, default=8069)
     db_name = fields.Char("Имя БД", required=True)
     login = fields.Char("Имя пользователя", required=True)
-    password = fields.Char("Пароль", required=True, password=True)
+    password = fields.Char("Пароль", required=True)
     sync_model_ids = fields.One2many(
-        "db.sync_model", "server_id", "Модели", ondelete="cascade"
+        "db.sync_model", "server_id", "Модели"
     )
+   
 
     def set_sequence_model_child(self, sequence):
         """Проход по моделям и установка Порядка для зависимых моделий ниже от зависимых"""
@@ -96,13 +97,13 @@ class DbSyncModel(models.Model):
     is_active_obj = fields.Boolean("Только активные?", default=False, help="Если установлен, в выборку будут поподать только активные (active) объекты. Если False то в поисковому домену будет добавлены также отключенные записи (active=False")
     sync_date = fields.Datetime("Последняя синхронизация")
     relation_sync_model_ids = fields.One2many(
-        "db.sync_model_relation", "sync_model_id", "IDs зависит от моделей", ondelete="cascade"
+        "db.sync_model_relation", "sync_model_id", "IDs зависит от моделей"
     )
     field_ids = fields.One2many(
-        "db.sync_model_field", "sync_model_id", "IDs полей модели", ondelete="cascade"
+        "db.sync_model_field", "sync_model_id", "IDs полей модели"
     )
     obj_ids = fields.One2many(
-        "db.sync_obj", "sync_model_id", "IDs объектов синхронизации", ondelete="cascade"
+        "db.sync_obj", "sync_model_id", "IDs объектов синхронизации"
     )
     field_ignored_ids = fields.One2many(
         "db.sync_model_field_ignored", "sync_model_id", "Игнорируемые поля объектов"

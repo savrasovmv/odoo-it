@@ -8,7 +8,7 @@ class Sklad(models.Model):
 
     name = fields.Char('Наименование')
     employee_id = fields.Many2one('hr.employee', string='МОЛ')
-    user_id = fields.Many2one('res.user', string='Пользователь')
+    user_id = fields.Many2one('res.users', string='Пользователь')
     location_id = fields.Many2one('sklad.location', string='Местонахождения')
    
 
