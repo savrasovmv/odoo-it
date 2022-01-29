@@ -766,9 +766,14 @@ class ZupSyncPersonalDoc(models.AbstractModel):
 
         date = datetime.today()
 
+        # param = {
+        #     "startDate": date_start.strftime("%Y-%m-%dT%H:%M:%S"),
+		#     "endDate": date_end.strftime("%Y-%m-%dT%H:%M:%S"),
+        # }
+        # Выборка документов по дате документа
         param = {
-            "startDate": date_start.strftime("%Y-%m-%dT%H:%M:%S"),
-		    "endDate": date_end.strftime("%Y-%m-%dT%H:%M:%S"),
+            "documentDateStart": date_start.strftime("%Y-%m-%dT%H:%M:%S"),
+		    "documentDateEnd": date_end.strftime("%Y-%m-%dT%H:%M:%S"),
         }
 
         
