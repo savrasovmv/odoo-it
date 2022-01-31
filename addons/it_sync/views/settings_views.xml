@@ -231,6 +231,17 @@
                             </div>
                         </div>
 
+                        <div class="col-lg-6 o_setting_box" id="it_sync">
+                            <div class="o_setting_right_pane" id="zup_settings">
+                                <label for="zup_query_interval"/>
+                                <div class="text-muted">
+                                    Задержка между запросами, сек
+                                </div>
+                                <field name="zup_query_interval" class="col-lg-2"/>
+
+                            </div>
+                        </div>
+
                         <div class="col-lg-12 o_setting_box" id="it_sync">
                             <div class="o_setting_right_pane" id="zup_settings">
                                 <label for="zup_url_get_empl_list"/>

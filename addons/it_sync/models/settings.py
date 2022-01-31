@@ -23,6 +23,7 @@ class Settings(models.TransientModel):
     zup_user = fields.Char(u'Пользователь ЗУП', default='')
     zup_password = fields.Char(u'Пароль ЗУП', default='')
     zup_timeout = fields.Integer(u'Timeout, сек', default=10)
+    zup_query_interval = fields.Integer(u'Задержка между запросами, сек', default=20)
     zup_url_get_empl_list = fields.Char(u'Список сотрудников', default='', help='URL API позвращает полный список работающих сотрудников на текущий момент')
     zup_url_get_empl = fields.Char(u'Получить сотрудника', default='', help='URL API позвращает сотрудника по ИД или ФИО')
     zup_url_get_dep_list = fields.Char(u'Список подразделений', default='', help='URL API позвращает полный список подразделений организации')
@@ -66,6 +67,7 @@ class Settings(models.TransientModel):
                 'zup_user': conf.get_param('zup_user'),
                 'zup_password': conf.get_param('zup_password'),
                 'zup_timeout': conf.get_param('zup_timeout'),
+                'zup_query_interval': conf.get_param('zup_query_interval'),
                 'zup_url_get_empl_list': conf.get_param('zup_url_get_empl_list'),
                 'zup_url_get_empl': conf.get_param('zup_url_get_empl'),
                 'zup_url_get_dep_list': conf.get_param('zup_url_get_dep_list'),
@@ -108,6 +110,7 @@ class Settings(models.TransientModel):
         conf.set_param('zup_user', str(self.zup_user))
         conf.set_param('zup_password', str(self.zup_password))
         conf.set_param('zup_timeout', int(self.zup_timeout))
+        conf.set_param('zup_query_interval', int(self.zup_query_interval))
         conf.set_param('zup_url_get_empl_list', str(self.zup_url_get_empl_list))
         conf.set_param('zup_url_get_empl', str(self.zup_url_get_empl))
         conf.set_param('zup_url_get_dep_list', str(self.zup_url_get_dep_list))
