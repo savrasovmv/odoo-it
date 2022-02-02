@@ -500,7 +500,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         for doc_obj in doc_obj_list:
             try:
                 result += self.zup_sync_personal_doc(doc_obj=doc_obj, date_start=date_start, date_end=date_end)
-                time.sleep(ZUP_QINTERVAL) # Задержка выполнения запросов
+                time.sleep(int(ZUP_QINTERVAL)) # Задержка выполнения запросов
             except Exception as error:
                 _logger.warning("Ошибка zup_sync_personal_doc_full %s" % str(error))
                 self.create_sync_log(date=date,result=str(error), is_error=True)
@@ -619,31 +619,40 @@ class ZupSyncPersonalDoc(models.AbstractModel):
 
                 document_date = get_date(line['documentDate'])
                 employee_guid_1c = line['employeeGuid1C']
+                empl_search = self.env['hr.employee'].search([
+                    ('guid_1c', '=', employee_guid_1c),
+                    '|',
+                    ('active', '=', False), 
+                    ('active', '=', True)
+                    ],limit=1)
+                if len(empl_search) == 0:
+                        message_error += "не найден сотрудник с gud1c %s \n" % ( employee_guid_1c)
 
-                if last_update_employee:
-                    if last_update_employee<document_date:
-                        empl_search = self.env['hr.employee'].search([
-                            ('guid_1c', '=', employee_guid_1c),
-                            '|',
-                            ('active', '=', False), 
-                            ('active', '=', True)
-                            ],limit=1)
-                        if len(empl_search) == 0:
-                            _logger.debug("Запрос в ЗУП для получения сотрудника по employee_guid_1c: %s" % employee_guid_1c)
 
-                            # Запрос в ЗУП для получения сотрудника по employee_guid_1c
-                            message_create_employee += self.env['zup.sync_employer'].zup_sync_employer(by_guid_1c=employee_guid_1c, is_def_change=True)
+                # if last_update_employee:
+                #     if last_update_employee<document_date:
+                #         empl_search = self.env['hr.employee'].search([
+                #             ('guid_1c', '=', employee_guid_1c),
+                #             '|',
+                #             ('active', '=', False), 
+                #             ('active', '=', True)
+                #             ],limit=1)
+                #         if len(empl_search) == 0:
+                #             _logger.debug("Запрос в ЗУП для получения сотрудника по employee_guid_1c: %s" % employee_guid_1c)
 
-                            # Повторный поиск сотрудника
-                            empl_search = self.env['hr.employee'].search([
-                            ('guid_1c', '=', employee_guid_1c),
-                            '|',
-                            ('active', '=', False), 
-                            ('active', '=', True)
-                            ],limit=1)
-                            if len(empl_search) == 0:
-                                _logger.debug("не найден сотрудник с employee_guid_1c %s, пропуск" % employee_guid_1c)
-                                message_error += "не найден сотрудник с gud1c %s, пропуск \n" % ( employee_guid_1c)
+                #             # Запрос в ЗУП для получения сотрудника по employee_guid_1c
+                #             message_create_employee += self.env['zup.sync_employer'].zup_sync_employer(by_guid_1c=employee_guid_1c, is_def_change=True)
+
+                #             # Повторный поиск сотрудника
+                #             empl_search = self.env['hr.employee'].search([
+                #             ('guid_1c', '=', employee_guid_1c),
+                #             '|',
+                #             ('active', '=', False), 
+                #             ('active', '=', True)
+                #             ],limit=1)
+                #             if len(empl_search) == 0:
+                #                 _logger.debug("не найден сотрудник с employee_guid_1c %s, пропуск" % employee_guid_1c)
+                #                 message_error += "не найден сотрудник с gud1c %s, пропуск \n" % ( employee_guid_1c)
                 
 
                 
@@ -882,23 +891,33 @@ class ZupSyncPersonalDoc(models.AbstractModel):
 
             # Если это прием на работу
             if doc_obj == 'hr.recruitment_doc':
-                # Последнее обновление сотрудников
-                last_update_employee = self.env['sync.log'].search([('obj','=','sync.zup_employer')],order='date desc').date
 
-                if last_update_employee:
-                    empl_search = self.env['hr.employee'].search([
+                empl_search = self.env['hr.employee'].search([
                             ('guid_1c', '=', employee_guid_1c),
                             '|',
                             ('active', '=', False), 
                             ('active', '=', True)
                             ],limit=1)
-                    # Если последнее обновление сотрудников меньше чем дата документа, то обновляем сотрудника 
-                    if last_update_employee<document_date and len(empl_search)==0:
-                        result_doc = self.env['zup.sync_employer'].zup_sync_employer(by_guid_1c=employee_guid_1c, is_def_change=True)
-                        if 'result' in result_doc:
-                            message_create += result_doc['message_create']
-                            message_update += result_doc['message_update']
-                            message_error += result_doc['message_error']
+                if len(empl_search)==0:
+                    message_error += "Не найден сотрудник с employeeGuid1C=%s \n" % employee_guid_1c
+
+                # # Последнее обновление сотрудников
+                # last_update_employee = self.env['sync.log'].search([('obj','=','sync.zup_employer')],order='date desc').date
+
+                # if last_update_employee:
+                #     empl_search = self.env['hr.employee'].search([
+                #             ('guid_1c', '=', employee_guid_1c),
+                #             '|',
+                #             ('active', '=', False), 
+                #             ('active', '=', True)
+                #             ],limit=1)
+                #     # Если последнее обновление сотрудников меньше чем дата документа, то обновляем сотрудника 
+                #     if last_update_employee<document_date and len(empl_search)==0:
+                #         result_doc = self.env['zup.sync_employer'].zup_sync_employer(by_guid_1c=employee_guid_1c, is_def_change=True)
+                #         if 'result' in result_doc:
+                #             message_create += result_doc['message_create']
+                #             message_update += result_doc['message_update']
+                #             message_error += result_doc['message_error']
 
                                     
 
