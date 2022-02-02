@@ -134,7 +134,7 @@ class AdUsers(models.Model):
     object_SID = fields.Char(u'objectSID')
     distinguished_name = fields.Char(u'distinguishedName')
     user_account_control = fields.Char(u'userAccountControl')
-    user_account_control_result = fields.Char(u'UAC результат', compute="_get_user_account_control_result")
+    user_account_control_result = fields.Char(u'UAC результат', compute="_get_user_account_control_result", store=True)
 
     photo = fields.Binary('Фото', default=False)
 

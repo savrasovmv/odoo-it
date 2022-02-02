@@ -16,6 +16,9 @@
                 <filter string="Активные" name="inactive" domain="[('active', '=', True)]"/>
                 <filter string="Отключенные" name="inactive" domain="[('active', '=', False)]"/>
                 <filter string="Все" name="inactive" domain="['|',('active', '=', False), ('active', '=', True)]"/>
+                <searchpanel>
+                    <field name="ou_id" string="OU" icon="fa-users"/>
+                </searchpanel>
             </search>
         </field>
     </record>
@@ -26,7 +29,7 @@
         <field name="arch" type="xml">
             <form string="Пользователь">
                 <header>
-                    <button name="action_update_from_ldap" type="object" string="Обновить из AD"/>
+                    <!-- <button name="action_update_from_ldap" type="object" string="Обновить из AD"/> -->
                     
                 </header>
                 <sheet>
@@ -53,8 +56,8 @@
 
                                 <group string="Контакты" colspan="2">
                                     <field name="ip_phone"/>
-                                    <field name="phone"/>
-                                    <field name="sec_phone"/>
+                                    <field name="phone" string="Моб. 1"/>
+                                    <field name="sec_phone" string="Моб. 2"/>
                                     <field name="email"/>
                                 </group>
                                 <group string="ФИО">
@@ -68,20 +71,26 @@
                         </page>
                         
                         <page string="Техническая информация">  
-                            <group string="">
+                            <group string="Праметры">
                                 <field name="username"/>
-                                <field name="distinguished_name"/>
-                                <field name="ad_middle_name"/>
                                 <field name="display_name"/>
-                                <field name="user_principal_name"/>
                                 <field name="sn"/>
-                                <field name="home_drive"/>
-                                <field name="home_directory"/>
+                                <field name="ad_middle_name"/>
+                                <field name="user_principal_name"/>
+                                <field name="distinguished_name"/>
                                 <field name="physical_delivery_office_name"/>
                                 <field name="www_home_page"/>
+                                <field name="object_SID"/>
+                            </group>
+                            <group string="Домашняя директория">
+                                <field name="home_drive"/>
+                                <field name="home_directory"/>
+                            </group>
+                            <group string="Контроль учетной записи">
                                 <field name="user_account_control"/>
                                 <field name="user_account_control_result"/>
-                                <field name="object_SID"/>
+                            </group>
+                            <group string="Изменения">
                                 <field name="pwd_last_set"/>
                                 <field name="when_changed"/>
                             </group>
