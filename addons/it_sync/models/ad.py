@@ -507,7 +507,31 @@ class AdSyncUsers(models.AbstractModel):
         if not LDAP_SEARCH_FILTER:
             raise 'Не заполнен параметр ldap_search_group_filter'
 
-        attributes = ['cn', 'title', 'ipPhone', 'mobile', 'mail', 'department', 'sn', 'memberof', 'distinguishedName', 'homePhone', 'whenChanged', 'objectSID', 'sAMAccountName', 'thumbnailPhoto', 'userAccountControl', 'middleName']
+        attributes = [
+            'cn', 
+            'title', 
+            'ipPhone', 
+            'mobile', 
+            'mail', 
+            'department', 
+            'sn', 
+            'memberof', 
+            'distinguishedName', 
+            'homePhone', 
+            'whenChanged', 
+            'objectSID', 
+            'sAMAccountName', 
+            'thumbnailPhoto', 
+            'userAccountControl', 
+            'middleName',
+            'Company',
+            'displayName',
+            'userPrincipalName',
+            'homeDrive',
+            'physicalDeliveryOfficeName',
+            'wWWHomePage',
+            'pwdLastSet',
+            ]
         
         try:
             res = self.ldap_search(
@@ -639,6 +663,15 @@ class AdSyncUsers(models.AbstractModel):
                     'object_SID': user['objectSID'].value,
                     'distinguished_name': user['distinguishedName'].value,
                     'user_account_control': user['userAccountControl'].value,
+                    'company': user['Company'].value,
+                    'display_name': user['displayName'].value,
+                    'user_principal_name': user['userPrincipalName'].value,
+                    'sn': user['SN'].value,
+                    'home_drive': user['homeDrive'].value,
+                    'physical_delivery_office_name': user['physicalDeliveryOfficeName'].value,
+                    'www_home_page': user['wWWHomePage'].value,
+                    'pwd_last_set': user['pwdLastSet'].value,
+                    'when_changed': user['whenChanged'].value,
                     'photo': thumbnailPhoto,
                     'active': active,
                     'is_ldap': True,

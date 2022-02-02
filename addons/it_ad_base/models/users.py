@@ -102,13 +102,13 @@ class AdUsers(models.Model):
 
     active = fields.Boolean('Active', default=True)
     is_ldap = fields.Boolean('LDAP?', default=False)
-    is_fit_middle = fields.Boolean('Отчетсв совпадает с АД ?', compute="_compute_is_fit_middle", store=True)
+    is_fit_middle = fields.Boolean('Отчетсво совпадает с middleName АД?', compute="_compute_is_fit_middle", store=True)
 
     # organization_id = fields.Many2one("ad.organizacion", string="Организация", compute="_compute_organization", store=True)
     # company_id = fields.Many2one('res.company', string='Компания', compute="_compute_company", store=True)
 
-    ou_id = fields.Many2one("ad.ou", string="Организационное подразделение AD")
-    department_id = fields.Many2one("ad.department", string="Подразделение AD")
+    ou_id = fields.Many2one("ad.ou", string="Организационное подразделение")
+    department_id = fields.Many2one("ad.department", string="Подразделение")
     title = fields.Char(u'Должность')
 
     ip_phone = fields.Char(u'Вн. номер')
@@ -118,11 +118,22 @@ class AdUsers(models.Model):
     email = fields.Char(u'E-mail')
 
     username = fields.Char(u'sAMAccountName')
-    ad_middle_name = fields.Char(u'AD middleName', )
-    object_SID = fields.Char(u'AD objectSID')
-    distinguished_name = fields.Char(u'AD distinguishedName')
-    user_account_control = fields.Char(u'AD userAccountControl')
-    user_account_control_result = fields.Char(u'AD userAccountControl result', compute="_get_user_account_control_result")
+    ad_middle_name = fields.Char(u'middleName', )
+
+    company = fields.Char(u'Company', )
+    display_name = fields.Char(u'displayName', )
+    user_principal_name = fields.Char(u'userPrincipalName', )
+    sn = fields.Char(u'SN', )
+    home_drive = fields.Char(u'homeDrive', )
+    physical_delivery_office_name = fields.Char(u'physicalDeliveryOfficeName', )
+    www_home_page = fields.Char(u'wWWHomePage', )
+    pwd_last_set = fields.Char(u'pwdLastSet', )
+    when_changed = fields.Char(u'whenChanged', )
+    
+    object_SID = fields.Char(u'objectSID')
+    distinguished_name = fields.Char(u'distinguishedName')
+    user_account_control = fields.Char(u'userAccountControl')
+    user_account_control_result = fields.Char(u'UAC результат', compute="_get_user_account_control_result")
 
     photo = fields.Binary('Фото', default=False)
 
