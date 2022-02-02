@@ -125,6 +125,7 @@ class AdUsers(models.Model):
     user_principal_name = fields.Char(u'userPrincipalName', )
     sn = fields.Char(u'SN', )
     home_drive = fields.Char(u'homeDrive', )
+    home_directory = fields.Char(u'homeDirectory', )
     physical_delivery_office_name = fields.Char(u'physicalDeliveryOfficeName', )
     www_home_page = fields.Char(u'wWWHomePage', )
     pwd_last_set = fields.Char(u'pwdLastSet', )
