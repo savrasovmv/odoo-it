@@ -95,10 +95,14 @@ class AdUsers(models.Model):
     _order = "name"
 
     name = fields.Char(u'ФИО', required=True)
+    first_name = fields.Char(u'Имя', compute="_compute_nemes_field", store=True)
+    last_name = fields.Char(u'Фамилия', compute="_compute_nemes_field", store=True)
+    middle_name = fields.Char(u'Отчество', compute="_compute_nemes_field", store=True)
     employee_id = fields.Many2one("hr.employee", string="Сотрудник")
 
     active = fields.Boolean('Active', default=True)
     is_ldap = fields.Boolean('LDAP?', default=False)
+    is_fit_middle = fields.Boolean('Отчетсв совпадает с АД ?', compute="_compute_is_fit_middle", store=True)
 
     # organization_id = fields.Many2one("ad.organizacion", string="Организация", compute="_compute_organization", store=True)
     # company_id = fields.Many2one('res.company', string='Компания', compute="_compute_company", store=True)
@@ -114,6 +118,7 @@ class AdUsers(models.Model):
     email = fields.Char(u'E-mail')
 
     username = fields.Char(u'sAMAccountName')
+    ad_middle_name = fields.Char(u'AD middleName', )
     object_SID = fields.Char(u'AD objectSID')
     distinguished_name = fields.Char(u'AD distinguishedName')
     user_account_control = fields.Char(u'AD userAccountControl')
@@ -122,6 +127,28 @@ class AdUsers(models.Model):
     photo = fields.Binary('Фото', default=False)
 
     users_group_line = fields.One2many('ad.users_group_line', 'users_id', string=u"Строка Группы AD")
+
+    @api.depends("name")
+    def _compute_nemes_field(self):
+        """Разделяет ФИО на Ф И и О"""
+        for record in self:
+            fio = record.name.split(' ')
+            if len(fio)>1:
+                record.last_name = fio[0]
+                record.first_name = fio[1]
+            if len(fio)>2:
+                record.middle_name = fio[2]
+
+    @api.depends("middle_name", "ad_middle_name")
+    def _compute_is_fit_middle(self):
+        """Расчитывает соврадает ли установленное middleName в АД с фактическим Отчеством"""
+        for record in self:
+            if record.ad_middle_name and record.middle_name==record.ad_middle_name:
+                record.is_fit_middle = True
+            else:
+                record.is_fit_middle = False
+
+                
 
 
     def get_employee_by_name(self):

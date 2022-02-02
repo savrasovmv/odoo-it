@@ -57,6 +57,11 @@
                                     <field name="sec_phone"/>
                                     <field name="email"/>
                                 </group>
+                                <group string="ФИО">
+                                    <field name="last_name"/>
+                                    <field name="first_name"/>
+                                    <field name="middle_name"/>
+                                </group>
                                 
                             </group>
 
@@ -66,10 +71,12 @@
                             <group string="">
                                 <field name="username"/>
                                 <field name="distinguished_name"/>
+                                <field name="ad_middle_name"/>
                                 <field name="user_account_control"/>
                                 <field name="user_account_control_result"/>
                                 <field name="object_SID"/>
                             </group>
+                            
                         </page>
                     </notebook>
                     

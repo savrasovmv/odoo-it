@@ -507,7 +507,7 @@ class AdSyncUsers(models.AbstractModel):
         if not LDAP_SEARCH_FILTER:
             raise 'Не заполнен параметр ldap_search_group_filter'
 
-        attributes = ['cn', 'title', 'ipPhone', 'mobile', 'mail', 'department', 'sn', 'memberof', 'distinguishedName', 'homePhone', 'whenChanged', 'objectSID', 'sAMAccountName', 'thumbnailPhoto', 'userAccountControl']
+        attributes = ['cn', 'title', 'ipPhone', 'mobile', 'mail', 'department', 'sn', 'memberof', 'distinguishedName', 'homePhone', 'whenChanged', 'objectSID', 'sAMAccountName', 'thumbnailPhoto', 'userAccountControl', 'middleName']
         
         try:
             res = self.ldap_search(
@@ -627,6 +627,7 @@ class AdSyncUsers(models.AbstractModel):
             
             vals = {
                     'name': user_name,
+                    'ad_middle_name': user['middleName'].value,
                     'ou_id': ou_id,
                     'department_id': department_id,
                     'title': user['title'].value,
