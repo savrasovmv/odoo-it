@@ -69,6 +69,14 @@ class SyncWizard(models.TransientModel):
         
         return self.return_result()
 
+    def ad_check_users_wizard_action(self):
+        try:
+            self.result = self.env['ad.sync_users'].sudo().ad_check_users()
+        except Exception as error:
+            return self.return_result(error=error)
+        
+        return self.return_result()
+
     def zup_sync_dep_wizard_action(self):
         try:
             self.result = self.env['zup.sync_dep'].sudo().zup_sync_dep()

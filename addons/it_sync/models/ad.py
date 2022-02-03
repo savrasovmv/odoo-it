@@ -707,9 +707,74 @@ class AdSyncUsers(models.AbstractModel):
         self.create_sync_log(result=result)
 
         return result
-       
+
+
+    def ad_check_users(self):
+        """Проверка существования пользователя в АД. Если удален то пометка удален, актив=Ложь"""
+
+        _logger.debug("Проверка существования пользователя в АД ad_check_users")
+
+        LDAP_SEARCH_FILTER = self.env['ir.config_parameter'].sudo().get_param('ldap_search_filter')
+        if not LDAP_SEARCH_FILTER:
+            raise 'Не заполнен параметр ldap_search_group_filter'
+
+        attributes = [
+            'objectSID', 
+            ]
+        
+        try:
+            res = self.ldap_search(
+                                    search_filter=LDAP_SEARCH_FILTER,
+                                    attributes=attributes,
+                                    full_sync=True
+                                )
+        except Exception as error:
+            raise error
+        
+        if res:
+            total_entries, data = res
+        else:
+            _logger.debug("Ошибка. Данные не получены")
+            raise 'Ошибка. Данные не получены'
+        
+        if total_entries == 0:
+            result = "Новых данных нет"
+            self.create_sync_log(result=result)
+            return result
+
+
+        n = 0
+        message_error = ''
+        message_user_del = ''
+        ad_users_list = [user['objectSID'].value for user in data]
+        ad_local_users_list = self.env['ad.users'].search([
+                                        '|',
+                                        ('active', '=', False), 
+                                        ('active', '=', True)
+                                    ]).mapped('object_SID')
+
+        result = "В АД существует %s пользователей, в локальной база %s \n" % (len(ad_users_list), len(ad_local_users_list))
+        _logger.debug(result)
+
+        on_del_users_list = list(set(ad_local_users_list) - set(ad_users_list))
+
+        if len(on_del_users_list)>0:
+            _logger.debug("В АД уже не существуют %s пользователей, с object_SID: %s" % (len(on_del_users_list), on_del_users_list))
+            
+            search_users = self.env['ad.users'].search([
+                                            ('object_SID', 'in', on_del_users_list),
+                                            '|',
+                                            ('active', '=', False), 
+                                            ('active', '=', True)
+                                        ])
+            message_user_del = "Будут помечены как удаленные записи: %s" % search_users
+            _logger.debug(message_user_del)
+            result+=message_user_del
+
+            search_users.set_del_user()
 
 
 
-    
+        self.create_sync_log(result=result)
 
+        return result

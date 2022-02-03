@@ -101,7 +101,8 @@ class AdUsers(models.Model):
     employee_id = fields.Many2one("hr.employee", string="Сотрудник")
 
     active = fields.Boolean('Active', default=True)
-    is_ldap = fields.Boolean('LDAP?', default=False)
+    is_del = fields.Boolean('Удален из АД', default=False, readonly=True)
+    is_ldap = fields.Boolean('LDAP?', default=False, readonly=True)
     is_fit_middle = fields.Boolean('Отчетсво совпадает с middleName АД?', compute="_compute_is_fit_middle", store=True)
 
     # organization_id = fields.Many2one("ad.organizacion", string="Организация", compute="_compute_organization", store=True)
@@ -117,23 +118,23 @@ class AdUsers(models.Model):
 
     email = fields.Char(u'E-mail')
 
-    username = fields.Char(u'sAMAccountName')
-    ad_middle_name = fields.Char(u'middleName', )
+    username = fields.Char(u'sAMAccountName', readonly=True)
+    ad_middle_name = fields.Char(u'middleName', readonly=True)
 
-    company = fields.Char(u'Company', )
-    display_name = fields.Char(u'displayName', )
-    user_principal_name = fields.Char(u'userPrincipalName', )
-    sn = fields.Char(u'SN', )
-    home_drive = fields.Char(u'homeDrive', )
-    home_directory = fields.Char(u'homeDirectory', )
-    physical_delivery_office_name = fields.Char(u'physicalDeliveryOfficeName', )
-    www_home_page = fields.Char(u'wWWHomePage', )
-    pwd_last_set = fields.Char(u'pwdLastSet', )
-    when_changed = fields.Char(u'whenChanged', )
+    company = fields.Char(u'Company', readonly=True)
+    display_name = fields.Char(u'displayName', readonly=True)
+    user_principal_name = fields.Char(u'userPrincipalName', readonly=True)
+    sn = fields.Char(u'SN', readonly=True)
+    home_drive = fields.Char(u'homeDrive', readonly=True)
+    home_directory = fields.Char(u'homeDirectory', readonly=True)
+    physical_delivery_office_name = fields.Char(u'physicalDeliveryOfficeName', readonly=True)
+    www_home_page = fields.Char(u'wWWHomePage', readonly=True)
+    pwd_last_set = fields.Char(u'pwdLastSet', readonly=True)
+    when_changed = fields.Char(u'whenChanged', readonly=True)
     
-    object_SID = fields.Char(u'objectSID')
-    distinguished_name = fields.Char(u'distinguishedName')
-    user_account_control = fields.Char(u'userAccountControl')
+    object_SID = fields.Char(u'objectSID', readonly=True)
+    distinguished_name = fields.Char(u'distinguishedName', readonly=True)
+    user_account_control = fields.Char(u'userAccountControl', readonly=True)
     user_account_control_result = fields.Char(u'UAC результат', compute="_get_user_account_control_result", store=True)
 
     photo = fields.Binary('Фото', default=False)
@@ -150,6 +151,7 @@ class AdUsers(models.Model):
                 record.first_name = fio[1]
             if len(fio)>2:
                 record.middle_name = fio[2]
+
 
     @api.depends("middle_name", "ad_middle_name")
     def _compute_is_fit_middle(self):
@@ -201,38 +203,15 @@ class AdUsers(models.Model):
 
 
 
-    # def update_group_list(self):
-    #     for empl in self:
-    #         group_list = self.env['ad.group'].search([
-    #                                             ('active', '=', True),
-    #                                             ('is_managed', '=', True),
-    #                                             ], order="name")
-            
-    #         empl.users_group_line.unlink()
-
-    #         for group in group_list:
-
-    #             empl.users_group_line.create({
-    #                 'name': group.name,
-    #                 'group_id': group.id,
-    #                 'users_id': empl.id,
-    #             })
+    @api.model
+    def set_del_user(self):
+        """Устанавливает пользователю признак удаленного из АД и не активного, is_del = True, active = False"""
+        
+        for record in self:
+            record.active = False
+            record.is_del = True
 
 
-
-
-
-    # @api.depends("branch_id", "branch_id.organization_id")
-    # def _compute_organization(self):
-    #     for record in self:
-    #         if record.branch_id:
-    #             record.organization_id = record.branch_id.organization_id
-    
-    # @api.depends("branch_id", "branch_id.company_id")
-    # def _compute_company(self):
-    #     for record in self:
-    #         if record.branch_id:
-    #             record.company_id = record.branch_id.company_id
 
     def _get_user_account_control_result(self):
         for record in self:

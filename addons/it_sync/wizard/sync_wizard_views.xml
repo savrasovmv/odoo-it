@@ -23,6 +23,10 @@
                     <p></p>
                     <p>Связать пользователей AD со справочником Сотрудники</p>
                     <button name="join_user_and_employee_wizard_action" string="Связать пользователей AD" type="object" class="oe_highlight"/>
+
+                    <p></p>
+                    <p>Проверить существования пользователей в АД, пометить не существующих как удаленные</p>
+                    <button name="ad_check_users_wizard_action" string="Проверить существования пользователей" type="object" class="oe_highlight"/>
                 </div>
                 <group string="Синхронизации с ЗУП">
 
