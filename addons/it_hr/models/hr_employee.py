@@ -37,6 +37,8 @@ FLAGS = [
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
+    # Что бы не было ошибок в доступе к hr.employee.public 
+    # для каждого реквизит нужно назначать группу доступа например groups="hr.group_hr_user"
 
     # 1С
     guid_1c = fields.Char(string='guid1C', readonly=True, groups="base.group_erp_manager, base.group_system")
