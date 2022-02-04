@@ -40,7 +40,7 @@ class HrEmployee(models.Model):
 
     # 1С
     guid_1c = fields.Char(string='guid1C', readonly=True, groups="base.group_erp_manager, base.group_system")
-    employment_type_1c = fields.Char(string='Вид занятости', readonly=True)
+    employment_type_1c = fields.Char(string='Вид занятости', readonly=True, groups="hr.group_hr_user",)
     number_1c = fields.Char(string='Номер в 1С', readonly=True)
 
     # Возраст
