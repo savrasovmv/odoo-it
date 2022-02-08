@@ -53,6 +53,26 @@
         </field>
     </record>
 
+    <record id="sklad_assets_view_search" model="ir.ui.view">
+        <field name="name">sklad.assets.view.search</field>
+        <field name="model">sklad.assets</field>
+        <field name="arch" type="xml">
+            <search string="Поиск Активов">
+                <field name="name"/>
+                <field name="assets_category_id"/>
+                <field name="serial_number"/>
+                <field name="invetory_number"/>
+                <separator/>
+                <group expand="0" string="Группировать по">
+                    <filter name="group_by_assets_category_id" string="Категории" domain="[]" context="{'group_by': 'assets_category_id'}"/>
+                </group>
+                <searchpanel>
+                    <field name="assets_category_id" string="Категории" icon="fa-folder"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
     <record id="sklad_assets_action" model="ir.actions.act_window">
         <field name="name">Активы</field>
         <field name="res_model">sklad.assets</field>
