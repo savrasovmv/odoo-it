@@ -113,6 +113,15 @@
                 />
 
             <menuitem
+                id="sklad_assets_category_menu"
+                name="Категории активов"
+                parent="sklad_settings_menu"
+                action="sklad_assets_category_action"
+                sequence="3"
+                groups="group_sklad_manager"
+                />
+
+            <menuitem
                 id="sklad_location_menu"
                 name="Местонахождения"
                 parent="sklad_settings_menu"

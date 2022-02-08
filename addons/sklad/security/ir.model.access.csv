@@ -5,6 +5,8 @@ access_sklad_location_manager,sklad.location,model_sklad_location,sklad.group_sk
 access_sklad_location_users,sklad.location,model_sklad_location,sklad.group_sklad_read_only,1,0,0,0
 access_sklad_assets_manager,sklad.assets,model_sklad_assets,sklad.group_sklad_manager,1,1,1,1
 access_sklad_assets_users,sklad.assets,model_sklad_assets,sklad.group_sklad_read_only,1,0,0,0
+access_sklad_assets_category_manager,sklad.assets_category,model_sklad_assets_category,sklad.group_sklad_manager,1,1,1,1
+access_sklad_assets_category_users,sklad.assets_category,model_sklad_assets_category,sklad.group_sklad_read_only,1,0,0,0
 access_sklad_product_uom_manager,sklad.product_uom,model_sklad_product_uom,sklad.group_sklad_manager,1,1,1,1
 access_sklad_product_uom_users,sklad.product_uom,model_sklad_product_uom,sklad.group_sklad_read_only,1,0,0,0
 access_sklad_product_category_manager,sklad.product_category,model_sklad_product_category,sklad.group_sklad_manager,1,1,1,1

@@ -12,18 +12,7 @@
         </field>
     </record>
 
-    <record id="sklad_assets_action" model="ir.actions.act_window">
-        <field name="name">Активы</field>
-        <field name="res_model">sklad.assets</field>
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-          <p>
-             Создайте новую запись
-          </p>
-        </field>
-    </record>
-
-
+  
 
     <record id="sklad_location_action" model="ir.actions.act_window">
         <field name="name">Местонахождения</field>

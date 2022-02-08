@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="sklad_assets_view_form" model="ir.ui.view">
+        <field name="name">sklad.assets.form</field>
+        <field name="model">sklad.assets</field>
+        <field name="arch" type="xml">
+            <form string="Актив">
+              <sheet>
+                <div class="oe_title" style="width: 100%;">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1><field name="name" placeholder="Наименование"/></h1>
+                </div>
+
+                <group>
+                  <group string="Категория">
+                    <field name="assets_category_id"/>
+
+                  </group>
+                  <group string="Идентификаторы">
+                    <field name="serial_number"/>
+                    <field name="invetory_number"/>
+                    <field name="bar_code"/>
+                    
+                  </group>
+
+                  <group string="Стоимость актива">
+                    <field name="original_value"/>
+                    <field name="date_acquisition"/>
+                  </group>
+
+                  <group string="1С">
+                    <field name="code_1c"/>
+                    <field name="nomen_1c"/>
+                    
+                  </group>
+                </group>
+              </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="sklad_assets_view_tree" model="ir.ui.view">
+        <field name="name">sklad.assets.tree</field>
+        <field name="model">sklad.assets</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="assets_category_id"/>
+                <field name="serial_number"/>
+                <field name="invetory_number"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sklad_assets_action" model="ir.actions.act_window">
+        <field name="name">Активы</field>
+        <field name="res_model">sklad.assets</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+
+
+    <record id="sklad_assets_category_action" model="ir.actions.act_window">
+        <field name="name">Категории активов</field>
+        <field name="res_model">sklad.assets_category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p>
+             Создайте новую запись
+          </p>
+        </field>
+    </record>
+
+
+
+  
+
+    
+
+   
+</odoo>

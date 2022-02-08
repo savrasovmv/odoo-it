@@ -11,6 +11,7 @@
     "depends": ["hr"],
     "data": [
         "views/product.xml",
+        "views/assets_views.xml",
         "views/sklad.xml",
         "views/transfer_use.xml",
         'security/sklad_security.xml',
