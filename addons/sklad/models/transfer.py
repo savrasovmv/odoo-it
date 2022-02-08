@@ -40,7 +40,7 @@ class TransferUseAssets(models.Model):
     location_dist_id = fields.Many2one('sklad.location', string='Место назначение', related="transfer_use_id.location_dist_id", store=True)
 
 
-    transfer_use_id = fields.Many2one('sklad.transfer_use', string='Передача в пользование')
+    transfer_use_id = fields.Many2one('sklad.transfer_use', ondelete='cascade', string='Передача в пользование')
 
 
 
@@ -55,7 +55,7 @@ class TransferUseProduct(models.Model):
     qty = fields.Float('Кол-во', default=0.0, digits=(10, 3), copy=False)
 
 
-    transfer_use_id = fields.Many2one('sklad.transfer_use', string='Передача в пользование')
+    transfer_use_id = fields.Many2one('sklad.transfer_use', ondelete='cascade', string='Передача в пользование')
 
 
 
