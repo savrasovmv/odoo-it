@@ -35,7 +35,39 @@ class ZupConnect(models.AbstractModel):
     _name = "zup.connect"
     _description = "Класс для работы с 1С:ЗУП"
 
-    def zup_search(self, url_api=False, full_sync=False, date=False,search_filter=False, attributes=False):
+    total_entries = fields.Integer('Получено записей', default=0, compute="_get_total_entries")
+    total_update = fields.Integer('Обновлено записей', default=0)
+    total_create = fields.Integer('Создано записей', default=0)
+
+    message_error = fields.Char('Сообщения об ошибках', default='')
+    message_update = fields.Char('Сообщения об обновления', default='')
+    message_create = fields.Char('Сообщения об создании', default='')
+    result = fields.Char('Результат', compute="_get_result", default='')
+
+
+    def _get_result(self):
+        self.result ='Всего получено из ЗУП %s записей \n' % str(self.total_entries)
+        if not self.message_error == '':
+            self.result = "\n Обновление прошло с предупреждениями: \n \n" + self.message_error
+        else:
+            self.result = "\n Обновление прошло успешно \n \n"
+
+        if not self.message_create == '':
+            self.result += "\n Создно %s новых записей: \n" % str(self.total_create)
+            self.result += self.message_create
+
+        if not self.message_update == '':
+            self.result += "\n Обновлено %s записей: \n" % str(self.total_update)
+            self.result += self.message_update
+    
+    def _get_total_entries(self, total):
+        self.total_entries = total
+        
+    def zup_search(self, url_api=False, full_sync=False, date=False, search_filter=False, attributes=False):
+        pass
+    
+    @api.model
+    def zup_get(self, url_api=False, full_sync=False, date=False, search_filter=False, attributes=False):
         """ Подключется к ЗУП, ищит записи, 
             Параметры:
                 full_sync - полная синхронизация, при установке ищит в журнале синхронизации, когда последний раз было обновление и добавляет в фильтр значение даты
@@ -43,7 +75,7 @@ class ZupConnect(models.AbstractModel):
                 attributes - требуемые атрибуты
             Возвращает:
                 total_entries - общее количество полученных записей
-                data - данные
+                data - данные, list []
          """
         _logger.info("Подключение к ЗУП")
 
@@ -54,6 +86,9 @@ class ZupConnect(models.AbstractModel):
         if not ZUP_USER or not ZUP_PASSWORD:
             _logger.error("Нет учетных данных для доступ к API ЗУП. Проверьте настройки")
             raise "Нет учетных данных для доступ к API ЗУП. Проверьте настройки"
+
+        if not url_api:
+            raise Exception("Не заполнен параметр url_api")
         
         try:
             response = requests.get(
@@ -71,11 +106,16 @@ class ZupConnect(models.AbstractModel):
             raise Exception("Ошибка при выполнении подключения к ЗУП:" + str(error))
 
         res = response.json()
-        total_entries = len(res['data'])
-        data = res['data']
-        _logger.info("Получены данные из ЗУП, в кол-ве: %s" % total_entries)
-        #return total_entries, data
-        return total_entries, data
+        if 'data' in res:
+            total_entries = len(res['data'])
+            self._get_total_entries(total_entries)
+            data = res['data']
+            _logger.info("Получены данные из ЗУП, в кол-ве: %s" % str(self.total_entries))
+            _logger.info("Получены данные из ЗУП, в кол-ве: %s" % len(res['data']))
+            # return total_entries, data
+            return data
+        else:
+            return False
 
     def zup_post(self, url_api=False, param={}, full_sync=False, date=False,search_filter=False, attributes=False):
         """ Подключется к ЗУП, POST, 
@@ -135,7 +175,7 @@ class ZupConnect(models.AbstractModel):
                     'obj': self.__class__.__name__, 
                     'name': self.__class__._description, 
                     'is_error': is_error,
-                    'result': result
+                    'result': self.result
                     })
 
 
@@ -145,43 +185,21 @@ class ZupSyncDep(models.AbstractModel):
     _name = 'zup.sync_dep'
     _description = 'Синхронизация подразделений ЗУП'
     _inherit = ['zup.connect']
-  
 
-    def zup_sync_dep(self):
-        """Загрузка информации по подразделениям из ЗУП"""
 
-        _logger.debug("Загрузка информации по подразделениям из ЗУП zup_sync_dep")
+    def load_department(self):
+        """Создать или обновить подразделения из данных API
+            'departamentList': [{'code': 'УД0000019',
+                               'guid1C': '4b11e662-7577-11e0-9863-00155d003102',
+                               'managerGuid1C': '',
+                               'name': 'Отдел информационных технологий',
+                               'parentGuid1C': '8ebff4a4-3194-11de-a918-0021853a356f'}],
+            data: набор записей из departamentList
+        """
 
-        date = datetime.today()
-        URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_dep_list')
-        if not URL_API:
-            raise Exception("Не заполнен параметр zup_url_get_dep_list")
-
-        try:
-            res = self.zup_search(
-                                    url_api=URL_API
-                                )
-        except Exception as error:
-            self.create_sync_log(date=date,result=error, is_error=True)
-            raise error
-
-        if res:
-            total_entries, data = res
-        else:
-            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
-            raise Exception('Ошибка. Данные не получены')
-        
-        if total_entries == 0:
-            result = "Новых данных нет"
-            self.create_sync_log(result=result)
-            return result
-        
         n = 0
-        message_error = ''
-        message_update = ''
-        message_create = ''
-        # Пример записи {'guid1C': 'e91bef40-1d5a-4942-80d4-e6febb61edb5', 'code': '49', 'name': 'Планово-экономический отдел', 'parentGuid1C': '493c1dd5-ba5b-11e9-94b3-00155d000c0e', 'managerGuid1C': ''}
-        for line in data:
+        print(self.data)
+        for line in self.data:
             if 'name' in line and 'guid1C' in line:
                 name = line['name'] 
                 guid_1c = line['guid1C']
@@ -225,32 +243,38 @@ class ZupSyncDep(models.AbstractModel):
                             break # Прерываем цикл. Значения не совпадают значит нужно обновить
                     
                     if is_update:
-                        message_update += name + '\n'
+                        self.message_update += name + '\n'
                         record_search.write(vals)
                 else:
                     n +=1
-                    message_create += name + '\n'
+                    self.message_create += name + '\n'
                     record_search.create(vals)
             else:
-                message_error += "Отсутствует Наименование или УИД 1С  в запси: %s \n" % line
+                print("+++++ line", line)
+                print("+++++ type line", type(line))
+                print("+++++ self.message_error", self.message_error)
+                self.message_error += "Отсутствует Наименование или УИД 1С  в запси: %s \n" % str(line)
 
+  
 
-        result ='Всего получено из ЗУП %s записей \n' % total_entries
-        if not message_error == '':
-            result = "\n Обновление прошло с предупреждениями: \n \n" + message_error
-        else:
-            result = "\n Обновление прошло успешно \n \n"
+    def zup_sync_dep(self):
+        """Загрузка информации по подразделениям из ЗУП"""
 
-        if not message_create == '':
-            result += "\n Создно %s новых Подразделений: \n" % n
-            result += message_create
+        _logger.debug("Загрузка информации по подразделениям из ЗУП zup_sync_dep")
 
-        if not message_update == '':
-            result += "\n Обновлены Подразделения: \n" + message_update
+        URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_dep_list')
 
-        self.create_sync_log(result=result)
+        res = self.zup_get(url_api=URL_API)
 
-        return result
+        if not res:
+            raise Exception('Ошибка. Данные не получены')
+        
+        # Пример записи {'guid1C': 'e91bef40-1d5a-4942-80d4-e6febb61edb5', 'code': '49', 'name': 'Планово-экономический отдел', 'parentGuid1C': '493c1dd5-ba5b-11e9-94b3-00155d000c0e', 'managerGuid1C': ''}
+        self.load_department()
+
+        self.create_sync_log()
+
+        return self.result
 
 class ZupSyncEmployer(models.AbstractModel):
     _name = 'zup.sync_employer'
@@ -1019,7 +1043,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                 Пример ответа:
                 {
                     {
-                        'dataType': 'documentChanges', 
+                        'dataType': 'objectChanges', 
                         'discription': '', 
                         'data': {
                             'recruitmentDocumentList': [
@@ -1035,6 +1059,8 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                 }
 
                 Виды документов:
+                            departamentList
+                            employeesList
                             recruitmentDocumentList
                             transferDocumentList
                             multipleTransferDocumentList
@@ -1047,7 +1073,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
             POST - для пометки обработанных документов
                 пример тела
                 {
-                "documentList": [
+                "objectList": [
                                     {
                                         "type": "transfer",
                                         "guid1C": "feb5c95e-0b1d-11ec-94f8-00155d01140c"
@@ -1060,6 +1086,8 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                 }
 
                 type может принимать типы:
+                                            departament
+                                            employee
                                             recruitment
                                             transfer
                                             multipleTransfer

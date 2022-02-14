@@ -78,10 +78,12 @@ class SyncWizard(models.TransientModel):
         return self.return_result()
 
     def zup_sync_dep_wizard_action(self):
-        try:
-            self.result = self.env['zup.sync_dep'].sudo().zup_sync_dep()
-        except Exception as error:
-            return self.return_result(error=error)
+        self.result = self.env['zup.sync_dep'].sudo().zup_sync_dep()
+
+        # try:
+        #     self.result = self.env['zup.sync_dep'].sudo().zup_sync_dep()
+        # except Exception as error:
+        #     return self.return_result(error=error)
         
         return self.return_result()
 
