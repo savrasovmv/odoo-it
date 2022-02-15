@@ -93,8 +93,12 @@
                                 <field name="user_account_control_result"/>
                             </group>
                             <group string="Изменения">
-                                <field name="pwd_last_set"/>
+                                <field name="date_when_created"/>
+                                <field name="when_created"/>
+                                <field name="date_when_changed"/>
                                 <field name="when_changed"/>
+                                <field name="date_pwd_last_set"/>
+                                <field name="pwd_last_set"/>
                             </group>
                             
                         </page>

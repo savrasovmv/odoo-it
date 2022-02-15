@@ -9,6 +9,7 @@ import re
 from openpyxl import Workbook
 import os, fnmatch
 from openpyxl.styles import Alignment, Border, Side, PatternFill, Font
+from datetime import datetime
 
 
 
@@ -129,8 +130,15 @@ class AdUsers(models.Model):
     home_directory = fields.Char(u'homeDirectory', readonly=True)
     physical_delivery_office_name = fields.Char(u'physicalDeliveryOfficeName', readonly=True)
     www_home_page = fields.Char(u'wWWHomePage', readonly=True)
+
     pwd_last_set = fields.Char(u'pwdLastSet', readonly=True)
+    date_pwd_last_set = fields.Datetime('Дата изменения пароля', compute="_compute_date_pwd_last_set", store=True)
+    
     when_changed = fields.Char(u'whenChanged', readonly=True)
+    date_when_changed = fields.Datetime('Дата изменения в АД', compute="_compute_date_when_changed", store=True)
+
+    when_created = fields.Char(u'whenCreated', readonly=True)
+    date_when_created = fields.Datetime('Дата создания в АД', compute="_compute_date_when_created", store=True)
     
     object_SID = fields.Char(u'objectSID', readonly=True)
     distinguished_name = fields.Char(u'distinguishedName', readonly=True)
@@ -151,6 +159,34 @@ class AdUsers(models.Model):
                 record.first_name = fio[1]
             if len(fio)>2:
                 record.middle_name = fio[2]
+
+    def _get_date_by_str(self, date_str):
+        try:
+            return datetime.strptime(date_str[:19], '%Y-%m-%d %H:%M:%S')
+        except:
+            return False
+
+
+
+    @api.depends("pwd_last_set")
+    def _compute_date_pwd_last_set(self):
+        """Преобразование текстовой даты в дату поле Дата изменения пароля"""
+        for record in self:
+            record.date_pwd_last_set = self._get_date_by_str(record.pwd_last_set)
+
+    @api.depends("when_changed")
+    def _compute_date_when_changed(self):
+        """Преобразование текстовой даты в дату поле Дата изменения в АД"""
+        for record in self:
+            record.date_when_changed = self._get_date_by_str(record.when_changed)
+    
+    @api.depends("when_created")
+    def _compute_date_when_created(self):
+        """Преобразование текстовой даты в дату поле Дата создания в АД"""
+        for record in self:
+            record.date_when_created = self._get_date_by_str(record.when_created)
+
+
 
 
     @api.depends("middle_name", "ad_middle_name")
