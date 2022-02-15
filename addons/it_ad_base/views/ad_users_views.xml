@@ -131,7 +131,7 @@
     <record id="ad_users_action" model="ir.actions.act_window">
         <field name="name">Пользователи AD</field>
         <field name="res_model">ad.users</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,pivot</field>
         <field name="help" type="html">
           <p>
              Создайте новую запись
