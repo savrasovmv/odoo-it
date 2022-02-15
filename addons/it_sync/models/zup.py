@@ -14,6 +14,7 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
+
 def get_date(date_text):
     """Возвращает форматированную дату если она не пуста, т.е не равна 0001-01-01T00:00:00"""
     date = False
@@ -35,37 +36,119 @@ class ZupConnect(models.AbstractModel):
     _name = "zup.connect"
     _description = "Класс для работы с 1С:ЗУП"
 
-    total_entries = fields.Integer('Получено записей', default=0, compute="_get_total_entries")
-    total_update = fields.Integer('Обновлено записей', default=0)
-    total_create = fields.Integer('Создано записей', default=0)
 
-    message_error = fields.Char('Сообщения об ошибках', default='')
-    message_update = fields.Char('Сообщения об обновления', default='')
-    message_create = fields.Char('Сообщения об создании', default='')
-    result = fields.Char('Результат', compute="_get_result", default='')
+    def get_result(self, 
+                    error=False,
+                    message_error='', 
+                    message_create='', 
+                    message_update='', 
+                    total_entries='',
+                    total_create='',
+                    total_update='',
+                    ):
+        """Возвращает текстовое представления результата"""
 
+        result =''
+        if error:
+            result = "\n Ошибка: \n \n" + message_error
+            return result
 
-    def _get_result(self):
-        self.result ='Всего получено из ЗУП %s записей \n' % str(self.total_entries)
-        if not self.message_error == '':
-            self.result = "\n Обновление прошло с предупреждениями: \n \n" + self.message_error
+        if total_entries>0:
+            result ='Всего получено из ЗУП %s записей \n' % total_entries
+        if not message_error == '':
+            result += "\n Обработка прошла с предупреждениями: \n \n" + message_error
         else:
-            self.result = "\n Обновление прошло успешно \n \n"
+            result += "\n Обработка прошла успешно \n \n"
 
-        if not self.message_create == '':
-            self.result += "\n Создно %s новых записей: \n" % str(self.total_create)
-            self.result += self.message_create
+        total_create = len(message_create.splitlines())
+        result += "\n Создно %s новых записей: \n" % str(total_create)
+        result += message_create
 
-        if not self.message_update == '':
-            self.result += "\n Обновлено %s записей: \n" % str(self.total_update)
-            self.result += self.message_update
+                                    
+        total_update = len(message_update.splitlines())
+        result += "\n Обновлено %s записей: \n" % str(total_update)
+        result += message_update
+        
+        return result
     
-    def _get_total_entries(self, total):
-        self.total_entries = total
+    
         
     def zup_search(self, url_api=False, full_sync=False, date=False, search_filter=False, attributes=False):
         pass
+
+
+    def zup_api(self, url_api=False, method='GET', param={}, full_sync=False, date=False, search_filter=False, attributes=False):
+        """ Подключется к ЗУП, ищит записи, 
+            Параметры:
+                full_sync - полная синхронизация, при установке ищит в журнале синхронизации, когда последний раз было обновление и добавляет в фильтр значение даты
+                search_filter - строка поиска
+                attributes - требуемые атрибуты
+            Возвращает:
+                total_entries - общее количество полученных записей
+                data - данные, list []
+         """
+        _logger.info("Подключение к ЗУП, метод " + method)
+
+        ZUP_USER = self.env['ir.config_parameter'].sudo().get_param('zup_user')
+        ZUP_PASSWORD = self.env['ir.config_parameter'].sudo().get_param('zup_password')
+        ZUP_TIMEOUT = self.env['ir.config_parameter'].sudo().get_param('zup_timeout')
+
+        if not ZUP_USER or not ZUP_PASSWORD:
+            str_error = "Нет учетных данных для доступ к API ЗУП. Проверьте настройки"
+            _logger.error(str_error)
+            self.create_sync_log(result=str_error)
+            raise str_error
+
+        if not url_api:
+            str_error = "Не заполнен параметр url_api"
+            _logger.error(str_error)
+            self.create_sync_log(result=str_error)
+            raise Exception(str_error)
+        
+        try:
+            if method == 'GET':
+                response = requests.get(
+                                url_api,
+                                auth=HTTPBasicAuth(ZUP_USER, ZUP_PASSWORD),
+                                timeout=int(ZUP_TIMEOUT)
+                                )
+            if method == 'POST':
+                response = requests.post(
+                                url_api,
+                                data=json.dumps(param),
+                                auth=HTTPBasicAuth(ZUP_USER, ZUP_PASSWORD),
+                                timeout=int(ZUP_TIMEOUT)
+                            )
+            if response.status_code != 200:
+                str_error = "Ошибка, Код ответа: %s" % response.status_code
+                _logger.error(str_error)
+                self.create_sync_log(result=str_error)
+                raise Exception(str_error)
+     
+        except Exception as error:
+            str_error = "Ошибка при выполнении подключения к ЗУП:" + str(error)
+            _logger.error(str_error)
+            self.create_sync_log(result=str_error)
+            raise Exception(str_error)
+
+        res = response.json()
+        if 'data' in res:
+            total_entries = len(res['data'])
+            if total_entries == 0:
+                _logger.info("Успех. Нет данных для обработки")
+                self.create_sync_log(result='Успех. Нет данных для обработки')
+                return False
+
+            data = res['data']
+            _logger.info("Получены данные из ЗУП, в кол-ве: %s" % str(total_entries))
+            return total_entries, data
+        else:
+            _logger.info("Подключение выполнено успешно, без возврата данных")
+            self.create_sync_log(result='Подключение выполнено успешно, без возврата данных')
+            return False
     
+
+
     @api.model
     def zup_get(self, url_api=False, full_sync=False, date=False, search_filter=False, attributes=False):
         """ Подключется к ЗУП, ищит записи, 
@@ -84,11 +167,16 @@ class ZupConnect(models.AbstractModel):
         ZUP_TIMEOUT = self.env['ir.config_parameter'].sudo().get_param('zup_timeout')
 
         if not ZUP_USER or not ZUP_PASSWORD:
-            _logger.error("Нет учетных данных для доступ к API ЗУП. Проверьте настройки")
-            raise "Нет учетных данных для доступ к API ЗУП. Проверьте настройки"
+            str_error = "Нет учетных данных для доступ к API ЗУП. Проверьте настройки"
+            _logger.error(str_error)
+            self.create_sync_log(result=str_error)
+            raise str_error
 
         if not url_api:
-            raise Exception("Не заполнен параметр url_api")
+            str_error = "Не заполнен параметр url_api"
+            _logger.error(str_error)
+            self.create_sync_log(result=str_error)
+            raise Exception(str_error)
         
         try:
             response = requests.get(
@@ -97,25 +185,29 @@ class ZupConnect(models.AbstractModel):
                                 timeout=int(ZUP_TIMEOUT)
                             )
             if response.status_code != 200:
-                err = "Ошибка, Код ответа: %s" % response.status_code
-                _logger.error(err)
-                raise Exception(err)
+                str_error = "Ошибка, Код ответа: %s" % response.status_code
+                _logger.error(str_error)
+                self.create_sync_log(result=str_error)
+                raise Exception(str_error)
      
         except Exception as error:
-            _logger.error("Ошибка при выполнении подключения к ЗУП:" + str(error))
-            raise Exception("Ошибка при выполнении подключения к ЗУП:" + str(error))
+            str_error = "Ошибка при выполнении подключения к ЗУП:" + str(error)
+            _logger.error(str_error)
+            self.create_sync_log(result=str_error)
+            raise Exception(str_error)
 
         res = response.json()
         if 'data' in res:
             total_entries = len(res['data'])
-            self._get_total_entries(total_entries)
             data = res['data']
-            _logger.info("Получены данные из ЗУП, в кол-ве: %s" % str(self.total_entries))
-            _logger.info("Получены данные из ЗУП, в кол-ве: %s" % len(res['data']))
-            # return total_entries, data
-            return data
+            _logger.info("Получены данные из ЗУП, в кол-ве: %s" % str(total_entries))
+            return total_entries, data
         else:
+            _logger.info("Подключение выполнено успешно, без возврата данных")
+            self.create_sync_log(result='Подключение выполнено успешно, без возврата данных')
             return False
+
+
 
     def zup_post(self, url_api=False, param={}, full_sync=False, date=False,search_filter=False, attributes=False):
         """ Подключется к ЗУП, POST, 
@@ -146,13 +238,16 @@ class ZupConnect(models.AbstractModel):
                                 timeout=int(ZUP_TIMEOUT)
                             )
             if response.status_code != 200:
-                err = "Ошибка, Код ответа: %s" % response.status_code
-                _logger.error(err)
-                raise Exception(err)
+                str_error = "Ошибка, Код ответа: %s" % response.status_code
+                _logger.error(str_error)
+                self.create_sync_log(result=str_error)
+                raise Exception(str_error)
      
         except Exception as error:
-            _logger.error("Ошибка при выполнении подключения к ЗУП:" + str(error))
-            raise Exception("Ошибка при выполнении подключения к ЗУП:" + str(error))
+            str_error = "Ошибка при выполнении подключения к ЗУП:" + str(error)
+            _logger.error(str_error)
+            self.create_sync_log(result=str_error)
+            raise Exception(str_error)
 
         res = response.json()
         if 'data' in res:
@@ -163,7 +258,8 @@ class ZupConnect(models.AbstractModel):
             return total_entries, data
         else:
             _logger.info("Подключение выполнено успешно, без возврата данных")
-            return True
+            self.create_sync_log(result='Подключение выполнено успешно, без возврата данных')
+            return False
 
 
     def create_sync_log(self, date=False, is_error=False, result=''):
@@ -175,7 +271,7 @@ class ZupConnect(models.AbstractModel):
                     'obj': self.__class__.__name__, 
                     'name': self.__class__._description, 
                     'is_error': is_error,
-                    'result': self.result
+                    'result': result
                     })
 
 
@@ -187,7 +283,7 @@ class ZupSyncDep(models.AbstractModel):
     _inherit = ['zup.connect']
 
 
-    def load_department(self):
+    def load_department(self, data):
         """Создать или обновить подразделения из данных API
             'departamentList': [{'code': 'УД0000019',
                                'guid1C': '4b11e662-7577-11e0-9863-00155d003102',
@@ -198,8 +294,11 @@ class ZupSyncDep(models.AbstractModel):
         """
 
         n = 0
-        print(self.data)
-        for line in self.data:
+        message_error = ''
+        message_update = ''
+        message_create = ''
+        # print(self.data)
+        for line in data:
             if 'name' in line and 'guid1C' in line:
                 name = line['name'] 
                 guid_1c = line['guid1C']
@@ -243,18 +342,23 @@ class ZupSyncDep(models.AbstractModel):
                             break # Прерываем цикл. Значения не совпадают значит нужно обновить
                     
                     if is_update:
-                        self.message_update += name + '\n'
+                        message_update += name + '\n'
                         record_search.write(vals)
                 else:
                     n +=1
-                    self.message_create += name + '\n'
+                    message_create += name + '\n'
                     record_search.create(vals)
             else:
-                print("+++++ line", line)
-                print("+++++ type line", type(line))
-                print("+++++ self.message_error", self.message_error)
-                self.message_error += "Отсутствует Наименование или УИД 1С  в запси: %s \n" % str(line)
+                message_error += "Отсутствует Наименование или УИД 1С  в запси: %s \n" % str(line)
 
+        result = self.get_result(
+                                    total_entries=len(data), 
+                                    message_update=message_update, 
+                                    message_create=message_create, 
+                                    message_error=message_error
+                                    )
+        self.create_sync_log(result=result)
+        return result
   
 
     def zup_sync_dep(self):
@@ -264,17 +368,18 @@ class ZupSyncDep(models.AbstractModel):
 
         URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_dep_list')
 
-        res = self.zup_get(url_api=URL_API)
+        res = self.zup_api(method='GET', url_api=URL_API)
 
         if not res:
-            raise Exception('Ошибка. Данные не получены')
-        
+            return "Нет данных"
+
+        total_entries, data = res
         # Пример записи {'guid1C': 'e91bef40-1d5a-4942-80d4-e6febb61edb5', 'code': '49', 'name': 'Планово-экономический отдел', 'parentGuid1C': '493c1dd5-ba5b-11e9-94b3-00155d000c0e', 'managerGuid1C': ''}
-        self.load_department()
+        result = self.load_department(data)
 
-        self.create_sync_log()
+        return result
 
-        return self.result
+
 
 class ZupSyncEmployer(models.AbstractModel):
     _name = 'zup.sync_employer'
