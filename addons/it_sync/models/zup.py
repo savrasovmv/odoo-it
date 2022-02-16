@@ -72,9 +72,6 @@ class ZupConnect(models.AbstractModel):
         return result
     
     
-        
-    def zup_search(self, url_api=False, full_sync=False, date=False, search_filter=False, attributes=False):
-        pass
 
 
     def zup_api(self, url_api=False, method='GET', param={}, full_sync=False, date=False, search_filter=False, attributes=False):
@@ -93,11 +90,14 @@ class ZupConnect(models.AbstractModel):
         ZUP_PASSWORD = self.env['ir.config_parameter'].sudo().get_param('zup_password')
         ZUP_TIMEOUT = self.env['ir.config_parameter'].sudo().get_param('zup_timeout')
 
+        if not ZUP_TIMEOUT:
+            ZUP_TIMEOUT = 20
+
         if not ZUP_USER or not ZUP_PASSWORD:
             str_error = "Нет учетных данных для доступ к API ЗУП. Проверьте настройки"
             _logger.error(str_error)
             self.create_sync_log(result=str_error)
-            raise str_error
+            raise Exception(str_error)
 
         if not url_api:
             str_error = "Не заполнен параметр url_api"
@@ -147,129 +147,15 @@ class ZupConnect(models.AbstractModel):
             self.create_sync_log(result='Подключение выполнено успешно, без возврата данных')
             return False
     
-
-
-    @api.model
-    def zup_get(self, url_api=False, full_sync=False, date=False, search_filter=False, attributes=False):
-        """ Подключется к ЗУП, ищит записи, 
-            Параметры:
-                full_sync - полная синхронизация, при установке ищит в журнале синхронизации, когда последний раз было обновление и добавляет в фильтр значение даты
-                search_filter - строка поиска
-                attributes - требуемые атрибуты
-            Возвращает:
-                total_entries - общее количество полученных записей
-                data - данные, list []
-         """
-        _logger.info("Подключение к ЗУП")
-
-        ZUP_USER = self.env['ir.config_parameter'].sudo().get_param('zup_user')
-        ZUP_PASSWORD = self.env['ir.config_parameter'].sudo().get_param('zup_password')
-        ZUP_TIMEOUT = self.env['ir.config_parameter'].sudo().get_param('zup_timeout')
-
-        if not ZUP_USER or not ZUP_PASSWORD:
-            str_error = "Нет учетных данных для доступ к API ЗУП. Проверьте настройки"
-            _logger.error(str_error)
-            self.create_sync_log(result=str_error)
-            raise str_error
-
-        if not url_api:
-            str_error = "Не заполнен параметр url_api"
-            _logger.error(str_error)
-            self.create_sync_log(result=str_error)
-            raise Exception(str_error)
-        
-        try:
-            response = requests.get(
-                                url_api,
-                                auth=HTTPBasicAuth(ZUP_USER, ZUP_PASSWORD),
-                                timeout=int(ZUP_TIMEOUT)
-                            )
-            if response.status_code != 200:
-                str_error = "Ошибка, Код ответа: %s" % response.status_code
-                _logger.error(str_error)
-                self.create_sync_log(result=str_error)
-                raise Exception(str_error)
-     
-        except Exception as error:
-            str_error = "Ошибка при выполнении подключения к ЗУП:" + str(error)
-            _logger.error(str_error)
-            self.create_sync_log(result=str_error)
-            raise Exception(str_error)
-
-        res = response.json()
-        if 'data' in res:
-            total_entries = len(res['data'])
-            data = res['data']
-            _logger.info("Получены данные из ЗУП, в кол-ве: %s" % str(total_entries))
-            return total_entries, data
-        else:
-            _logger.info("Подключение выполнено успешно, без возврата данных")
-            self.create_sync_log(result='Подключение выполнено успешно, без возврата данных')
-            return False
-
-
-
-    def zup_post(self, url_api=False, param={}, full_sync=False, date=False,search_filter=False, attributes=False):
-        """ Подключется к ЗУП, POST, 
-            Параметры:
-                param - параметры запроса
-                full_sync - полная синхронизация, при установке ищит в журнале синхронизации, когда последний раз было обновление и добавляет в фильтр значение даты
-                search_filter - строка поиска
-                attributes - требуемые атрибуты
-            Возвращает:
-                total_entries - общее количество полученных записей
-                data - данные
-         """
-        _logger.info("Подключение к ЗУП (post)")
-
-        ZUP_USER = self.env['ir.config_parameter'].sudo().get_param('zup_user')
-        ZUP_PASSWORD = self.env['ir.config_parameter'].sudo().get_param('zup_password')
-        ZUP_TIMEOUT = self.env['ir.config_parameter'].sudo().get_param('zup_timeout')
-
-        if not ZUP_USER or not ZUP_PASSWORD:
-            _logger.error("Нет учетных данных для доступ к API ЗУП. Проверьте настройки")
-            raise "Нет учетных данных для доступ к API ЗУП. Проверьте настройки"
-        
-        try:
-            response = requests.post(
-                                url_api,
-                                data=json.dumps(param),
-                                auth=HTTPBasicAuth(ZUP_USER, ZUP_PASSWORD),
-                                timeout=int(ZUP_TIMEOUT)
-                            )
-            if response.status_code != 200:
-                str_error = "Ошибка, Код ответа: %s" % response.status_code
-                _logger.error(str_error)
-                self.create_sync_log(result=str_error)
-                raise Exception(str_error)
-     
-        except Exception as error:
-            str_error = "Ошибка при выполнении подключения к ЗУП:" + str(error)
-            _logger.error(str_error)
-            self.create_sync_log(result=str_error)
-            raise Exception(str_error)
-
-        res = response.json()
-        if 'data' in res:
-            total_entries = len(res['data'])
-            data = res['data']
-            _logger.info("Получены данные из ЗУП, в кол-ве: %s" % total_entries)
-            #return total_entries, data
-            return total_entries, data
-        else:
-            _logger.info("Подключение выполнено успешно, без возврата данных")
-            self.create_sync_log(result='Подключение выполнено успешно, без возврата данных')
-            return False
-
-
-    def create_sync_log(self, date=False, is_error=False, result=''):
+    
+    def create_sync_log(self, date=False, is_error=False, result='', doc_name=''):
         """Создает запись в журнале синхронизации с AD"""
         if not date:
             date = datetime.today()
         self.env['sync.log'].sudo().create({
                     'date': date, 
                     'obj': self.__class__.__name__, 
-                    'name': self.__class__._description, 
+                    'name': self.__class__._description + " " + doc_name, 
                     'is_error': is_error,
                     'result': result
                     })
@@ -292,7 +178,6 @@ class ZupSyncDep(models.AbstractModel):
                                'parentGuid1C': '8ebff4a4-3194-11de-a918-0021853a356f'}],
             data: набор записей из departamentList
         """
-
         n = 0
         message_error = ''
         message_update = ''
@@ -300,6 +185,7 @@ class ZupSyncDep(models.AbstractModel):
         # print(self.data)
         for line in data:
             if 'name' in line and 'guid1C' in line:
+
                 name = line['name'] 
                 guid_1c = line['guid1C']
                 code_1c = line['code'] if 'code' in line else ''
@@ -367,9 +253,9 @@ class ZupSyncDep(models.AbstractModel):
         _logger.debug("Загрузка информации по подразделениям из ЗУП zup_sync_dep")
 
         URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_dep_list')
-
-        res = self.zup_api(method='GET', url_api=URL_API)
-
+        
+        res = self.zup_api(method='GET', url_api=False)
+        
         if not res:
             return "Нет данных"
 
@@ -386,55 +272,10 @@ class ZupSyncEmployer(models.AbstractModel):
     _description = 'Синхронизация сотрудников ЗУП'
     _inherit = ['zup.connect']
 
-    def zup_sync_employer(self, by_guid_1c=False, is_def_change=False):
-        """Загрузка информации по Сотрудникам из ЗУП"""
-
-        _logger.debug("Загрузка информации по Сотрудникам из ЗУП zup_sync_employer")
-
-        date = datetime.today()
-
-        if by_guid_1c:
-            URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_empl')
-        else:
-            URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_empl_list')
-        
-        if not URL_API:
-            raise Exception("Не заполнен параметр zup_url_get_empl_list или zup_url_get_empl")
-
-        try:
-            if by_guid_1c:
-                param = {'guid1C': by_guid_1c}
-                res = self.zup_post(
-                                    param=param,
-                                    url_api=URL_API
-                                )
-
-            else:
-                res = self.zup_search(
-                                    url_api=URL_API
-                                )
-        except Exception as error:
-            self.create_sync_log(date=date,result=error, is_error=True)
-            raise error
-
-        total_entries = 0
-        
-        if res and isinstance(res, tuple):
-            if by_guid_1c:
-                total_entries, line = res
-                data = [line,] # Преобразуем в массив для, т.к результат содержит одну запись
-            else:
-                total_entries, data = res
-        else:
-            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
-            result = "Данные по сотруднику не получены"
-            return result
-        
-        if total_entries == 0:
-            result = "Новых данных нет"
-            self.create_sync_log(result=result)
-            return result
-        
+    def load_employer(self, data):
+        """Загрузка данных по сотрудникам
+            data - список данных
+        """
         n = 0
         message_error = ''
         message_update = ''
@@ -568,32 +409,58 @@ class ZupSyncEmployer(models.AbstractModel):
                     record_search.create(vals)
             else:
                 message_error += "Отсутствует обязательное поле в запси: %s \n" % line
-
-        if is_def_change:
-            return {
-                'result': True,
-                'message_update': message_update,
-                'message_create': message_create,
-                'message_error': message_error,
-            }
-
-        result ='Всего получено из ЗУП %s записей \n' % total_entries
-        if not message_error == '':
-            result += "\n Обновление прошло с предупреждениями: \n \n" + message_error
-        else:
-            result += "\n Обновление прошло успешно \n \n"
-
-        if not message_create == '':
-            result += "\n Создно %s новых Сотрудников: \n" % n
-            result += message_create
-
-        if not message_update == '':
-            result += "\n Обновлены Сотрудники: \n" + message_update
-
+        
+        result = self.get_result(
+                                    total_entries=len(data), 
+                                    message_update=message_update, 
+                                    message_create=message_create, 
+                                    message_error=message_error
+                                    )
         self.create_sync_log(result=result)
-
         return result
 
+    def zup_sync_employer(self, by_guid_1c=False, is_def_change=False):
+        """Загрузка информации по Сотрудникам из ЗУП
+            by_guid_1c - идентификатор 1С сотрудника, в этом случае поиск только по одному конкретному сотруднику
+        
+        """
+
+        _logger.debug("Загрузка информации по Сотрудникам из ЗУП zup_sync_employer")
+
+        date = datetime.today()
+
+        if by_guid_1c:
+            URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_empl')
+            param = {'guid1C': by_guid_1c}
+            method = 'POST'
+        else:
+            URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_empl_list')
+            param = {}
+            method = 'GET'
+
+        res = self.zup_api(
+                        method=method,
+                        param=param,
+                        url_api=URL_API
+                    )
+
+
+        if res and isinstance(res, tuple):
+            if by_guid_1c:
+                total_entries, line = res
+                data = [line,] # Преобразуем в массив для, т.к результат содержит одну запись
+            else:
+                total_entries, data = res
+            
+            result = self.load_employer(data)
+
+        else:
+            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
+            result = "Данные по сотруднику не получены"
+            return result
+        
+
+        return result
 
 
 
@@ -633,7 +500,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
             except Exception as error:
                 _logger.warning("Ошибка zup_sync_personal_doc_full %s" % str(error))
                 self.create_sync_log(date=date,result=str(error), is_error=True)
-                raise error
+                raise Exception(error)
 
         return result
 
@@ -705,31 +572,27 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         if not URL_API:
             raise Exception("Не заполнен параметр zup_url_get_recruitment_doc_list")
 
-        try:
+        res = self.zup_api(
+                        method='POST',
+                        url_api=URL_API,
+                        param=param
+                    )
+        if not res:
+            return "Нет данных"
 
-            res = self.zup_post(
-                                    url_api=URL_API,
-                                    param=param
-                                )
-        except Exception as error:
-            self.create_sync_log(date=date,result=error, is_error=True)
-            raise error
-
-        if res:
-            total_entries, data = res
-        else:
-            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
-            raise Exception('Ошибка. Данные не получены')
-        
-        if total_entries == 0:
-            result = "Новых данных нет"
-            self.create_sync_log(result=result)
-            return result
+        total_entries, data = res
 
         if doc_obj == 'hr.transfer_doc_multi': # Перевод на другую ф-ю
             return self.zup_sync_multi_transfer_doc(data)
+        else:
+            result = self.load_personal_doc(doc_obj, data)
 
         doc_name = self.env[doc_obj]._description
+
+        return "\n \n Обработка " + doc_name + "\n" + result
+
+
+    def load_personal_doc(self, doc_obj, data):
         n = 0
         message_error = ''
         message_update = ''
@@ -757,39 +620,6 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                 if len(empl_search) == 0:
                         message_error += "не найден сотрудник с gud1c %s \n" % ( employee_guid_1c)
 
-
-                # if last_update_employee:
-                #     if last_update_employee<document_date:
-                #         empl_search = self.env['hr.employee'].search([
-                #             ('guid_1c', '=', employee_guid_1c),
-                #             '|',
-                #             ('active', '=', False), 
-                #             ('active', '=', True)
-                #             ],limit=1)
-                #         if len(empl_search) == 0:
-                #             _logger.debug("Запрос в ЗУП для получения сотрудника по employee_guid_1c: %s" % employee_guid_1c)
-
-                #             # Запрос в ЗУП для получения сотрудника по employee_guid_1c
-                #             message_create_employee += self.env['zup.sync_employer'].zup_sync_employer(by_guid_1c=employee_guid_1c, is_def_change=True)
-
-                #             # Повторный поиск сотрудника
-                #             empl_search = self.env['hr.employee'].search([
-                #             ('guid_1c', '=', employee_guid_1c),
-                #             '|',
-                #             ('active', '=', False), 
-                #             ('active', '=', True)
-                #             ],limit=1)
-                #             if len(empl_search) == 0:
-                #                 _logger.debug("не найден сотрудник с employee_guid_1c %s, пропуск" % employee_guid_1c)
-                #                 message_error += "не найден сотрудник с gud1c %s, пропуск \n" % ( employee_guid_1c)
-                
-
-                
-                # if empl_search.department_id:
-                #     department_id = empl_search.department_id.id
-                # else:
-                #     department_id = False
-
                 # Постоянные параметры документов
                 const_vals = {
                     'date': get_date(line['documentDate']),
@@ -799,8 +629,6 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                     'employee_guid_1c': line['employeeGuid1C'],
                     # 'employee_id': empl_search.id,
                 }
-
-                
 
                 # Индивидуальные параметры
                 doc_vals = {}
@@ -826,11 +654,6 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                     }
                     
                 if doc_obj == 'hr.transfer_doc':
-                    # dep_search = self.env['hr.department'].search([
-                    #         ('guid_1c', '=', line['departament'])
-                    #     ],limit=1)
-
-                    # print('++++++++++++===')
                     doc_vals = {
                         'start_date': get_date(line['startDate']),
                         'end_date': get_date(line['endDate']),
@@ -842,8 +665,6 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                 vals = {**const_vals, **doc_vals}
 
                 _logger.debug("Данные объекта %s, со значениями: %s " % (doc_obj, vals))
-
-
 
                 doc_search = self.env[doc_obj].search([
                         ('guid_1c', '=', guid_1c)
@@ -862,43 +683,23 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                 message_error += "Отсутствует обязательное поле в запси: %s \n" % line
                 _logger.debug("Отсутствует обязательное поле в запси: %s" % line)
 
-
-
-        result ='Всего получено из ЗУП %s записей \n' % total_entries
-        if len(message_error)>0:
-            result += "\n Обновление прошло с предупреждениями: \n \n" + message_error
-            _logger.warning(result)
-        else:
-            result += "\n Обновление прошло успешно \n \n"
-
-
-
-        if not message_update == '':
-            result += "\n Обновлены Документы %s: \n" % doc_name 
-            result +=  message_update
-        if not message_create == '':
-            result += "\n Созданы Документы %s: \n" % doc_name 
-            result +=  message_create
-
-        _logger.debug(result)
-
-        self.create_sync_log(result=result)
-
+        result = self.get_result(
+                                    total_entries=len(data), 
+                                    message_update=message_update, 
+                                    message_create=message_create, 
+                                    message_error=message_error
+                                    )
+        doc_name = self.env[doc_obj]._description
+        self.create_sync_log(result=result, doc_name=doc_name)
         return result
 
 
 
-
-
-    def zup_sync_multi_transfer_doc(self, data, is_def_change=False):
+    def load_multi_transfer_doc(self, data, is_def_change=False):
         """Загрузка документов групповых переводов ЗУП
             is_def_change - признак запуска этой функции в другой функции. Если да, то вернет значения результата выполнения, иначе запишит лог
         """
         _logger.debug("Загрузка документов групповых переводов ЗУП zup_sync_multi_transfer_doc")
-
-        if not data:
-            raise Exception("Нет данных для синхронизации")
-        
 
         date = datetime.today()
         doc_name = self.env['hr.transfer_doc']._description
@@ -968,181 +769,23 @@ class ZupSyncPersonalDoc(models.AbstractModel):
             else:
                 message_error += "Отсутствует обязательное поле в запси: %s \n" % line
 
-        if is_def_change:
-            return {
-                'result': True,
-                'message_update': message_update,
-                'message_create': message_create,
-                'message_error': message_error,
-            }
+        result = self.get_result(
+                                    total_entries=len(data), 
+                                    message_update=message_update, 
+                                    message_create=message_create, 
+                                    message_error=message_error
+                                    )
 
-
-        result ='Всего получено из ЗУП %s записей \n' % n
-        if not message_error == '':
-            result = "\n Обновление прошло с предупреждениями: \n \n" + message_error
-        else:
-            result = "\n Обновление прошло успешно \n \n"
-
-        _logger.info(result)
-
-        if not message_update == '':
-            result += "\n Обновлены Документы %s: \n" % doc_name 
-            result +=  message_update
-        if not message_create == '':
-            result += "\n Созданы Документы %s: \n" % doc_name 
-            result +=  message_create
-
-        self.create_sync_log(result=result)
-
+        self.create_sync_log(result=result, doc_name=doc_name)
         return result
 
 
-
-
-    
-
-
-    def update_personal_doc(self, doc_obj, data, create_employer=False):
-
-        _logger.debug("Обновление персональных документв ЗУП update_personal_doc")
-
-        message_update = ''
-        message_create = ''
-        message_error = ''
-        doc_name = ''
-
-        if 'guid1C' in data:
-             
-            guid_1c = data['guid1C'] # Идентификатор документа
-
-            employee_guid_1c = data['employeeGuid1C']
-            document_date = get_date(data['documentDate'])
-
-            # Если это прием на работу
-            if doc_obj == 'hr.recruitment_doc':
-
-                empl_search = self.env['hr.employee'].search([
-                            ('guid_1c', '=', employee_guid_1c),
-                            '|',
-                            ('active', '=', False), 
-                            ('active', '=', True)
-                            ],limit=1)
-                if len(empl_search)==0:
-                    message_error += "Не найден сотрудник с employeeGuid1C=%s \n" % employee_guid_1c
-
-                # # Последнее обновление сотрудников
-                # last_update_employee = self.env['sync.log'].search([('obj','=','sync.zup_employer')],order='date desc').date
-
-                # if last_update_employee:
-                #     empl_search = self.env['hr.employee'].search([
-                #             ('guid_1c', '=', employee_guid_1c),
-                #             '|',
-                #             ('active', '=', False), 
-                #             ('active', '=', True)
-                #             ],limit=1)
-                #     # Если последнее обновление сотрудников меньше чем дата документа, то обновляем сотрудника 
-                #     if last_update_employee<document_date and len(empl_search)==0:
-                #         result_doc = self.env['zup.sync_employer'].zup_sync_employer(by_guid_1c=employee_guid_1c, is_def_change=True)
-                #         if 'result' in result_doc:
-                #             message_create += result_doc['message_create']
-                #             message_update += result_doc['message_update']
-                #             message_error += result_doc['message_error']
-
-                                    
-
-
-            # if empl_search.department_id:
-            #     department_id = empl_search.department_id.id
-            # else:
-            #     if 'departament' in data:
-            #         dep_search = self.env['hr.department'].search([
-            #             ('guid_1c', '=', data['departament'])
-            #             ],limit=1)
-            #         if len(dep_search)>0:
-            #             department_id = dep_search.id
-            #         else:
-            #             department_id = False
-
-            # Постоянные параметры документов
-            const_vals = {
-                'date': get_date(data['documentDate']),
-                'posted': data['posted'],
-                'guid_1c': data['guid1C'],
-                'number_1c': data['number'],
-                'employee_guid_1c': data['employeeGuid1C'],
-                # 'employee_id': empl_search.id,
-            }
-            
-
-            # Индивидуальные параметры
-            doc_vals = {}
-            if doc_obj == 'hr.recruitment_doc':
-                doc_vals = {
-                    'service_start_date': data['recruitmenDate'],
-                    'employment_type': data['employmentType'],
-                    # 'department_id': department_id,
-                    'job_title': data['position'],
-                    'department_guid_1c': data['departament'],
-                }
-
-            if doc_obj == 'hr.termination_doc':
-                doc_vals = {
-                    'service_termination_date': data['dismissDate'],
-                }
-
-            if doc_obj == 'hr.vacation_doc' or doc_obj == 'hr.trip_doc' or doc_obj == 'hr.sick_leave_doc':
-                doc_vals = {
-                    'start_date': get_date(data['startDate']),
-                    'end_date': get_date(data['endDate']),
-                }
-
-            if doc_obj == 'hr.transfer_doc':
-                dep_search = self.env['hr.department'].search([
-                    ('guid_1c', '=', data['departament'])
-                    ],limit=1)
-
-                doc_vals = {
-                    'start_date': get_date(data['startDate']),
-                    'end_date': get_date(data['endDate']),
-                    'job_title': data['position'],
-                    'department_guid_1c': data['departament'],
-                    # 'department_id': dep_search.id if len(dep_search)>0 else False,
-                }
-
-            vals = {**const_vals, **doc_vals}
-
-            doc_name = self.env[doc_obj]._description
-            doc_search = self.env[doc_obj].search([
-                ('guid_1c', '=', guid_1c)
-            ],limit=1)
-            if len(doc_search)>0:
-                # print(vals)
-                doc = doc_search.write(vals)
-                message_update += doc_name + ' ' + data['number'] + ' от ' + data['documentDate'] + '\n'
-            elif vals['posted'] == True: #создаем только проведенные документы
-                doc = self.env[doc_obj].create(vals)
-                message_create += doc_name + ' ' + data['number'] + ' от ' + data['documentDate'] + '\n'
-            
-        else:
-            message_error = "Отсутствует обязательное поле в запси: %s \n" % data
-            return {
-                'result': False,
-                'message_update': message_update,
-                'message_create': message_create,
-                'message_error': message_error,
-            }
-
-        return {
-            'result': True,
-            'message_update': message_update,
-            'message_create': message_create,
-            'message_error': message_error,
-        }
        
 
     
     def zup_sync_personal_doc_change(self):
         """Загрузка измененных документов из ЗУП
+            Загружает данные из плана обмена 1С
 
             GET - получение измененных документов
                 Пример ответа:
@@ -1210,41 +853,50 @@ class ZupSyncPersonalDoc(models.AbstractModel):
 
 
         URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_change_doc_list')
-        if not URL_API:
-            raise Exception("Не заполнен параметр zup_url_get_change_doc_list")
-
+        
         URL_API_REMOVE = self.env['ir.config_parameter'].sudo().get_param('zup_url_remove_change_doc_list')
-        if not URL_API_REMOVE:
-            raise Exception("Не заполнен параметр zup_url_remove_change_doc_list")
             
-        try:
-            res = self.zup_search(
-                                    url_api=URL_API,
-                                )
-        except Exception as error:
-            self.create_sync_log(date=date,result=error, is_error=True)
-            raise error
+        res = self.zup_api(
+                        method='GET',
+                        url_api=URL_API,
+                        )
+        if not res:
+            return "Нет данных"
 
-        if res:
-            total_entries, data = res
-        else:
-            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
-            raise Exception('Ошибка. Данные не получены')
         
-        if total_entries == 0:
-            result = "Новых данных нет"
-            self.create_sync_log(result=result)
-            return result
+        total_entries, data = res
         
-        n = 0
+        
+        result = ''
         message_error = ''
-        message_update = ''
-        message_create = ''
         guid_change_doc_list = []
+
+        
+        if 'departamentList' in data:
+            result += "\n---------------------------------\n"
+            result += "Обработка Подразделения \n \n"
+            remove_type  = 'departament'
+            result += self.env['zup.sync_dep'].load_department(data['departamentList'])
+            for line in data['departamentList']:
+                if 'guid1C' in line:
+                    guid_change_doc_list.append({'type': remove_type, 'guid1C': line['guid1C']}) 
+            
+        if 'employeesList' in data:
+            result += "\n---------------------------------\n"
+            result += "Обработка Сотрудники \n \n"
+            remove_type  = 'employee'
+            result += self.env['zup.sync_employer'].load_employer(data['employeesList'])
+            for line in data['employeesList']:
+                if 'guid1C' in line:
+                    guid_change_doc_list.append({'type': remove_type, 'guid1C': line['guid1C']}) 
+        
         for type_doc in data:
             _logger.debug("Тип документа: %s" % type_doc)
 
             doc_obj = False
+
+            if type_doc == 'departamentList' or type_doc == 'employeesList':
+                continue # Переход к следующей записи, т.к уже обработали
                            
             if type_doc == 'recruitmentDocumentList':
                 doc_obj = 'hr.recruitment_doc'
@@ -1272,60 +924,41 @@ class ZupSyncPersonalDoc(models.AbstractModel):
                 message_error += "не найден объект с именем %s, пропуск \n" % ( type_doc)
                 continue # Переход к следующей записи
 
+            doc_name = self.env[doc_obj]._description
+            result += "\n---------------------------------\n"
+            result += "Обработка " + doc_name + "\n \n"
+            if type_doc == 'multipleTransferDocumentList':
+                result += self.load_multi_transfer_doc(data[type_doc])
+            else:
+                result += self.load_personal_doc(doc_obj, data[type_doc])
+
+            # Добавляем в список guid документов для отправки обработанных документов
             for line in data[type_doc]:
                 if 'guid1C' in line:
-                    guid_1c = line['guid1C']
-                    n += 1
-                    if type_doc == 'multipleTransferDocumentList':
-                        # print(line)
-                        result_doc = self.zup_sync_multi_transfer_doc(data=line, is_def_change=True)
-                    else:
-                        result_doc = self.update_personal_doc(doc_obj=doc_obj, data=line, create_employer=True)
-                
-                result_create = result_doc['result']
-                if result_create:
-                    guid_change_doc_list.append({'type': remove_type, 'guid1C': guid_1c}) 
-                message_create += result_doc['message_create']
-                message_update += result_doc['message_update']
-                message_error += result_doc['message_error']
-
-
-
-        result ='Всего получено из ЗУП %s записей \n' % n
-        if not message_error == '':
-            result = "\n Обновление прошло с предупреждениями: \n \n" + message_error
-        else:
-            result = "\n Обновление прошло успешно \n \n"
-
-        _logger.info(result)
-
-        if not message_update == '':
-            result += "\n Обновлены Документы %s: \n" 
-            result +=  message_update
-        if not message_create == '':
-            result += "\n Созданы Документы %s: \n" 
-            result +=  message_create
-
-        self.create_sync_log(result=result)
+                    guid_change_doc_list.append({'type': remove_type, 'guid1C': line['guid1C']}) 
+            
+            
 
         # print(guid_change_doc_list)
 
         param = {
-            "documentList": guid_change_doc_list
+            "objectList": guid_change_doc_list
         }
 
-        try:
-            if len(guid_change_doc_list)>0:
-                res = self.zup_post(
-                                    param=param,
-                                    url_api=URL_API_REMOVE
-                                )
-        except Exception as error:
-            self.create_sync_log(date=date,result=error, is_error=True)
-            raise error
+        res = True
+        if len(guid_change_doc_list)>0:
+            res = False
+            # res = self.zup_api(
+            #                 method='POST',
+            #                 param=param,
+            #                 url_api=URL_API_REMOVE
+            #                 )
 
         if not res:
-            result += "Ошибка при пометке измененных документов"
+            if message_error != '':
+                result += message_error +'\n \n'
+            result += 'Данные переданы в 1С: \n' + str(guid_change_doc_list)
+            self.create_sync_log(result=result, doc_name='Выгрузка в 1С обработанных документов')
 
         return result
 
@@ -1419,28 +1052,23 @@ class ZupSyncPassport(models.AbstractModel):
 
         date = datetime.today()
         URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_passport_list')
-        if not URL_API:
-            raise Exception("Не заполнен параметр zup_url_get_passport_list")
 
-        try:
-            res = self.zup_search(
-                                    url_api=URL_API
-                                )
-        except Exception as error:
-            self.create_sync_log(date=date,result=error, is_error=True)
-            raise error
+        res = self.zup_api(
+                                method='GET',
+                                url_api=URL_API
+                            )
+        
 
-        if res:
-            total_entries, data = res
-        else:
-            self.create_sync_log(date=date,result='Ошибка. Данные не получены', is_error=True)
-            raise Exception('Ошибка. Данные не получены')
+        if not res:
+            return "Нет данных"
         
-        if total_entries == 0:
-            result = "Новых данных нет"
-            self.create_sync_log(result=result)
-            return result
-        
+        total_entries, data = res
+              
+        result = self.load_passport(data)
+
+        return result
+
+    def load_passport(self, data):
         n = 0
         message_error = ''
         message_update = ''
@@ -1567,18 +1195,11 @@ class ZupSyncPassport(models.AbstractModel):
             else:
                 message_error += "Отсутствует обязательное поле в запси: %s \n" % line
 
-
-        result ='Всего получено из ЗУП %s записей \n' % total_entries
-        if not message_error == '':
-            result = "\n Обновление прошло с предупреждениями: \n \n" + message_error
-        else:
-            result = "\n Обновление прошло успешно \n \n"
-
-        _logger.info(result)
-
-        if not message_update == '':
-            result += "\n Обновлены Документы УЛ и адреса сотрудников: \n" + message_update
-
+        result = self.get_result(
+                                    total_entries=len(data), 
+                                    message_update=message_update, 
+                                    message_create=message_create, 
+                                    message_error=message_error
+                                    )
         self.create_sync_log(result=result)
-
         return result
