@@ -569,8 +569,6 @@ class ZupSyncPersonalDoc(models.AbstractModel):
             raise Exception("Не указан тип объект документа для синхронизации")
 
         URL_API = self.env['ir.config_parameter'].sudo().get_param(param_api)
-        if not URL_API:
-            raise Exception("Не заполнен параметр zup_url_get_recruitment_doc_list")
 
         res = self.zup_api(
                         method='POST',
@@ -583,7 +581,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         total_entries, data = res
 
         if doc_obj == 'hr.transfer_doc_multi': # Перевод на другую ф-ю
-            return self.zup_sync_multi_transfer_doc(data)
+            return self.load_multi_transfer_doc(data)
         else:
             result = self.load_personal_doc(doc_obj, data)
 
@@ -699,7 +697,7 @@ class ZupSyncPersonalDoc(models.AbstractModel):
         """Загрузка документов групповых переводов ЗУП
             is_def_change - признак запуска этой функции в другой функции. Если да, то вернет значения результата выполнения, иначе запишит лог
         """
-        _logger.debug("Загрузка документов групповых переводов ЗУП zup_sync_multi_transfer_doc")
+        _logger.debug("Загрузка документов групповых переводов ЗУП load_multi_transfer_doc")
 
         date = datetime.today()
         doc_name = self.env['hr.transfer_doc']._description

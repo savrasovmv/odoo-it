@@ -19,7 +19,9 @@ class BaseHrDoc(models.AbstractModel):
             if line.employee_id:
                 line.name = line.employee_id.name
 
+    @api.depends("employee_guid_1c")
     def _get_employee(self):
+
         for line in self:
             if line.employee_guid_1c:
                 empl_search = self.env['hr.employee'].search([
@@ -29,6 +31,7 @@ class BaseHrDoc(models.AbstractModel):
                     ('active', '=', True)
                     ],limit=1)
                 line.employee_id = empl_search.id
+
             else:
                 line.employee_id = False
 
@@ -46,6 +49,7 @@ class HrRecruitmentDoc(models.Model):
     department_id = fields.Many2one("hr.department", string="Подразделение", compute="_get_department", store=True)
     department_guid_1c = fields.Char(string="guid подразделение 1C")
 
+    @api.depends("department_guid_1c")
     def _get_department(self):
         for line in self:
             if line.department_guid_1c:
@@ -243,7 +247,7 @@ class HrTransferDoc(models.Model):
 
     is_multi_transfer = fields.Boolean(string='Групповой перевод', readonly=True)
 
-
+    @api.depends("department_guid_1c")
     def _get_department(self):
         for line in self:
             if line.department_guid_1c:
@@ -263,13 +267,13 @@ class HrTransferDoc(models.Model):
     #         if line.employee_id:
     #             line.name = line.employee_id.name
 
-    @api.depends("job_title", "department_guid_1c")
+    @api.depends("employee_guid_1c", "job_title", "department_guid_1c")
     def _get_old(self):
         for line in self:
             old_transfer = self.search([
                 ('date', '<', line.date),
                 ('posted', '=', True),
-                ('employee_id', '=', line.employee_id.id),
+                ('employee_guid_1c', '=', line.employee_guid_1c),
             ], limit=1)
             
             if len(old_transfer)>0:
@@ -278,7 +282,7 @@ class HrTransferDoc(models.Model):
             else:
                 recruitment = self.env['hr.recruitment_doc'].search([
                     ('posted', '=', True),
-                    ('employee_id', '=', line.employee_id.id),
+                    ('employee_guid_1c', '=', line.employee_guid_1c),
                 ], limit=1)
                 if len(recruitment)>0:
                     line.old_job_title = recruitment.job_title
