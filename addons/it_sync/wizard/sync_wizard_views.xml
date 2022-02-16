@@ -52,7 +52,7 @@
                         <field name="start_date"/>
                         <field name="end_date"/>
                     </group>
-                    <p>Загружает Кадровые Документы</p>
+                    <p>Загружает Кадровые Документы за выбранный период</p>
                     <button name="zup_sync_personal_doc_wizard_action" string="Обновить Кадровые Документы из ЗУП" type="object" class="oe_highlight"/>
 
                 </div>
@@ -60,7 +60,7 @@
 
                 <div>
                     <p></p>
-                    <p>Загружает Измененные Кадровые документы</p>
+                    <p>Загружает Измененные Кадровые документы, по методу плана обмена 1С</p>
                     <button name="zup_sync_personal_doc_change_wizard_action" string="Измененные Кадровые документы" type="object" class="oe_highlight"/>
                     <p></p>
                     <group string="Статусы сотрудников">

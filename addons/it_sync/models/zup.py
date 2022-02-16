@@ -947,12 +947,11 @@ class ZupSyncPersonalDoc(models.AbstractModel):
 
         res = True
         if len(guid_change_doc_list)>0:
-            res = False
-            # res = self.zup_api(
-            #                 method='POST',
-            #                 param=param,
-            #                 url_api=URL_API_REMOVE
-            #                 )
+            res = self.zup_api(
+                            method='POST',
+                            param=param,
+                            url_api=URL_API_REMOVE
+                            )
 
         if not res:
             if message_error != '':
