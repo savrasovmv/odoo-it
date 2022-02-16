@@ -254,7 +254,7 @@ class ZupSyncDep(models.AbstractModel):
 
         URL_API = self.env['ir.config_parameter'].sudo().get_param('zup_url_get_dep_list')
         
-        res = self.zup_api(method='GET', url_api=False)
+        res = self.zup_api(method='GET', url_api=URL_API)
         
         if not res:
             return "Нет данных"
